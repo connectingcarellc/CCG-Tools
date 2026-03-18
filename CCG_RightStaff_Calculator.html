@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Right-Staff Calculator — ConnectingCare Group</title>
+<link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;600;700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--navy:#1B2A4A;--teal:#0D7B8A;--gold:#C9963A;--green:#1A7A4A;--red:#C0392B;--gray:#4A5568;--lgray:#F1F4F8;--white:#fff;--lgold:#FEF6E8;--lgreen:#E8F5EE;--lred:#FDECEA;--lblue:#EAF3FB;--orange:#E67E22;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',sans-serif;background:var(--lgray);color:var(--gray);line-height:1.6;}
+h1,h2,h3,h4{font-family:'Lora',serif;}
+.header{background:var(--navy);}
+.header-inner{max-width:960px;margin:0 auto;padding:32px 24px;}
+.eyebrow{font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--teal);margin-bottom:10px;}
+.header h1{font-size:clamp(22px,4vw,36px);color:white;font-weight:700;line-height:1.2;margin-bottom:10px;}
+.header-sub{color:rgba(255,255,255,0.7);font-size:14px;max-width:600px;line-height:1.7;}
+.header-badges{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px;}
+.badge{background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.8);padding:3px 12px;border-radius:20px;font-size:11px;font-weight:600;}
+.progress-wrap{background:rgba(255,255,255,0.1);height:4px;}
+.progress-bar{height:4px;background:var(--teal);transition:width 0.4s ease;width:0%;}
+.progress-label{max-width:960px;margin:0 auto;padding:8px 24px;display:flex;justify-content:space-between;}
+.progress-text{font-size:12px;color:rgba(255,255,255,0.6);}
+.main{max-width:960px;margin:0 auto;padding:32px 24px 80px;}
+.screen{display:none;}.screen.active{display:block;}
+.screen-title{font-size:26px;font-weight:700;color:var(--navy);margin-bottom:6px;}
+.screen-sub{font-size:15px;color:var(--gray);margin-bottom:24px;max-width:640px;}
+.section-card{background:white;border-radius:14px;padding:28px;margin-bottom:20px;border:1px solid #e8e8e8;}
+.section-title{font-size:17px;font-weight:700;color:var(--navy);margin-bottom:6px;display:flex;align-items:center;gap:10px;}
+.section-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+.section-sub{font-size:13px;color:var(--gray);margin-bottom:20px;opacity:0.8;}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.form-grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;}
+@media(max-width:640px){.form-grid,.form-grid-3{grid-template-columns:1fr;}}
+.form-group{display:flex;flex-direction:column;gap:5px;}
+.form-group.full{grid-column:1/-1;}
+.form-group label{font-size:13px;font-weight:600;color:var(--navy);}
+.hint{font-size:11px;color:var(--gray);opacity:0.7;margin-top:2px;}
+input,select{padding:10px 14px;border:1.5px solid #d0d0d0;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:14px;color:var(--gray);transition:border-color 0.2s;width:100%;}
+input:focus,select:focus{outline:none;border-color:var(--teal);}
+.prefix-wrap{position:relative;}
+.prefix-wrap .prefix{position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:14px;color:var(--gray);pointer-events:none;}
+.prefix-wrap input{padding-left:26px;}
+.divider{height:1px;background:#f0f0f0;margin:20px 0;}
+.yn-row{display:flex;gap:8px;}
+.yn-btn{flex:1;padding:9px;border:1.5px solid #d0d0d0;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;background:white;color:var(--gray);transition:all 0.2s;font-family:'DM Sans',sans-serif;}
+.yn-btn.yes.active{background:var(--green);border-color:var(--green);color:white;}
+.yn-btn.no.active{background:var(--red);border-color:var(--red);color:white;}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:12px 28px;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;border:none;transition:all 0.2s;text-decoration:none;}
+.btn-primary{background:var(--teal);color:white;}
+.btn-primary:hover{background:#0a6575;}
+.btn-secondary{background:white;color:var(--navy);border:2px solid #d0d0d0;}
+.btn-gold{background:var(--gold);color:white;}
+.btn-gold:hover{background:#a87d2e;}
+.btn-row{display:flex;gap:12px;margin-top:28px;flex-wrap:wrap;}
+.callout{border-radius:10px;padding:14px 18px;font-size:13px;line-height:1.6;margin:12px 0;}
+.c-teal{background:var(--lblue);border-left:4px solid var(--teal);color:var(--navy);}
+.c-gold{background:var(--lgold);border-left:4px solid var(--gold);color:var(--navy);}
+.c-red{background:var(--lred);border-left:4px solid var(--red);color:var(--navy);}
+.c-green{background:var(--lgreen);border-left:4px solid var(--green);color:var(--navy);}
+/* RESULTS */
+.results-hero{background:var(--navy);border-radius:14px;padding:32px;color:white;margin-bottom:24px;}
+.stat-row{display:flex;gap:24px;flex-wrap:wrap;margin-top:16px;}
+.stat-item{min-width:120px;}
+.stat-label{font-size:12px;opacity:0.7;margin-bottom:2px;}
+.stat-value{font-size:28px;font-weight:700;font-family:'Lora',serif;}
+.results-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px;}
+@media(max-width:640px){.results-grid{grid-template-columns:1fr;}}
+.rc{background:white;border-radius:12px;padding:20px;border-top:4px solid;}
+.rc-lbl{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gray);margin-bottom:6px;}
+.rc-val{font-size:26px;font-weight:700;font-family:'Lora',serif;line-height:1.1;margin-bottom:4px;}
+.rc-sub{font-size:12px;color:var(--gray);}
+.bar-wrap{height:8px;background:var(--lgray);border-radius:4px;margin-top:10px;overflow:hidden;}
+.bar{height:8px;border-radius:4px;transition:width 1s ease;}
+.pill{display:inline-flex;align-items:center;padding:4px 16px;border-radius:20px;font-size:13px;font-weight:700;}
+.pill-safe{background:var(--lgreen);color:var(--green);}
+.pill-caution{background:var(--lgold);color:#8B6914;}
+.pill-unsafe{background:var(--lred);color:var(--red);}
+.pill-critical{background:#f8d7da;color:#721c24;}
+.cost-tbl{width:100%;border-collapse:collapse;font-size:14px;}
+.cost-tbl th{background:var(--lgray);padding:10px 14px;text-align:left;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--navy);}
+.cost-tbl td{padding:10px 14px;border-bottom:1px solid #f0f0f0;}
+.cost-tbl tr:last-child td{border-bottom:none;font-weight:700;background:var(--lgold);}
+.pos{color:var(--green);font-weight:600;}
+.neg{color:var(--red);font-weight:600;}
+.action-box{background:var(--lgold);border-radius:14px;padding:28px;margin-bottom:24px;border-left:5px solid var(--gold);}
+.action-box h3{color:var(--navy);margin-bottom:16px;}
+.a-item{display:flex;gap:12px;margin-bottom:14px;align-items:flex-start;}
+.a-num{width:30px;height:30px;border-radius:50%;background:var(--gold);color:white;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0;margin-top:2px;}
+.a-text{font-size:14px;color:var(--gray);line-height:1.6;}
+.roadmap{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-top:16px;}
+@media(max-width:640px){.roadmap{grid-template-columns:1fr;}}
+.rp{background:white;border-radius:10px;padding:16px;border-top:3px solid var(--teal);}
+.rp h4{font-size:13px;font-weight:700;color:var(--navy);margin-bottom:8px;}
+.rp ul{list-style:none;padding:0;}
+.rp li{font-size:12px;color:var(--gray);padding:3px 0 3px 14px;position:relative;}
+.rp li::before{content:'→';position:absolute;left:0;color:var(--teal);font-size:11px;}
+.star-row{display:flex;gap:4px;margin-top:6px;font-size:22px;}
+.star-filled{color:var(--gold);}
+.star-empty{color:#ddd;}
+.cta-box{background:var(--teal);border-radius:14px;padding:32px;color:white;text-align:center;margin-bottom:24px;}
+.cta-box h3{font-size:20px;margin-bottom:8px;}
+.cta-box p{opacity:0.85;margin-bottom:20px;font-size:14px;}
+.disclaimer{background:white;border-radius:12px;padding:20px;font-size:12px;color:var(--gray);line-height:1.7;border:1px solid #e8e8e8;}
+.yn-wrap{display:flex;flex-direction:column;gap:16px;}
+.yn-item label{display:block;font-size:13px;font-weight:600;color:var(--navy);margin-bottom:6px;}
+@media print{.header,.progress-wrap,.progress-label,.btn-row,.cta-box,.no-print{display:none!important;}body{background:white;}.main{padding:0;}}
+</style>
+</head>
+<body>
+<div class="header">
+  <div class="header-inner">
+    <p class="eyebrow">ConnectingCare Group · Clinical Operations Intelligence</p>
+    <h1>Right-Staff Calculator</h1>
+    <p class="header-sub">Determine the optimal staffing model for your facility — and calculate the true financial cost of chronic understaffing vs. right-staffing. Built in response to frontline clinical staff intelligence.</p>
+    <div class="header-badges">
+      <span class="badge">SNFs · LTACHs · FQHCs · Hospitals · Practices</span>
+      <span class="badge">CMS 42 CFR 483.35</span>
+      <span class="badge">ANA Staffing Principles 2022</span>
+      <span class="badge">AHRQ · BLS Wage Data</span>
+    </div>
+  </div>
+  <div class="progress-wrap"><div class="progress-bar" id="progressBar"></div></div>
+  <div class="progress-label">
+    <span class="progress-text" id="progressText">Module 1 of 2</span>
+    <span class="progress-text" id="progressPct">0%</span>
+  </div>
+</div>
+
+<div class="main">
+
+<!-- MODULE 1 -->
+<div class="screen active" id="screen-0">
+  <h2 class="screen-title">Module 1 — Current State</h2>
+  <p class="screen-sub">Tell us about your facility and current staffing. Facility type and census are required. All other fields improve accuracy.</p>
+
+  <div class="section-card">
+    <div class="section-title"><span class="section-icon" style="background:var(--lblue)">🏥</span>Facility Information</div>
+    <p class="section-sub">Basic information about your organization and patient population</p>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Facility / Unit Type *</label>
+        <select id="facilityType" onchange="updateDefaults()">
+          <option value="">Select type...</option>
+          <optgroup label="Post-Acute &amp; Senior Care">
+            <option value="snf">Skilled Nursing Facility (SNF)</option>
+            <option value="ltach">Long-Term Acute Care Hospital (LTACH)</option>
+            <option value="al">Assisted Living Community</option>
+            <option value="mc">Memory Care Facility</option>
+          </optgroup>
+          <optgroup label="Hospital">
+            <option value="medsurg">Hospital Med-Surg Unit</option>
+            <option value="icu">Hospital ICU / Critical Care</option>
+            <option value="ed">Emergency Department</option>
+          </optgroup>
+          <optgroup label="Primary &amp; Community Care">
+            <option value="fqhc">FQHC / Community Health Center</option>
+            <option value="practice">Independent Practice</option>
+            <option value="rhc">Rural Health Clinic</option>
+          </optgroup>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>State</label>
+        <select id="facilityState">
+          <option value="">Select state...</option>
+          <option value="CA">California (ratio law)</option>
+          <option value="NY">New York (ratio law)</option>
+          <option value="MA">Massachusetts</option>
+          <option value="WA">Washington</option>
+          <option value="OR">Oregon</option>
+          <option value="OTHER">Other state</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Licensed Beds / Exam Rooms *</label>
+        <input type="number" id="licensedBeds" placeholder="e.g. 120" min="1">
+      </div>
+      <div class="form-group">
+        <label>Current Census / Daily Volume *</label>
+        <input type="number" id="currentCensus" placeholder="e.g. 98" min="1">
+        <span class="hint">Average patients/residents currently in your facility</span>
+      </div>
+    </div>
+    <div class="divider"></div>
+    <p style="font-size:13px;font-weight:600;color:var(--navy);margin-bottom:12px;">Acuity Distribution (should total 100%)</p>
+    <div class="form-grid">
+      <div class="form-group"><label>% Low Acuity</label><input type="number" id="acuityLow" placeholder="e.g. 20" min="0" max="100"></div>
+      <div class="form-group"><label>% Moderate Acuity</label><input type="number" id="acuityMod" placeholder="e.g. 50" min="0" max="100"></div>
+      <div class="form-group"><label>% High Acuity</label><input type="number" id="acuityHigh" placeholder="e.g. 25" min="0" max="100"></div>
+      <div class="form-group"><label>% Critical Acuity</label><input type="number" id="acuityCrit" placeholder="e.g. 5" min="0" max="100"></div>
+    </div>
+  </div>
+
+  <div class="section-card">
+    <div class="section-title"><span class="section-icon" style="background:var(--lgreen)">👥</span>Current Staffing — Per Shift</div>
+    <p class="section-sub">Enter your typical day shift staffing. Leave blank for roles not used at your facility.</p>
+    <div class="form-grid-3">
+      <div class="form-group"><label>Registered Nurses (RNs)</label><input type="number" id="rnCount" placeholder="e.g. 4" min="0"></div>
+      <div class="form-group"><label>Licensed Practical Nurses</label><input type="number" id="lpnCount" placeholder="e.g. 3" min="0"></div>
+      <div class="form-group"><label>CNAs / Nurse Aides</label><input type="number" id="cnaCount" placeholder="e.g. 8" min="0"></div>
+      <div class="form-group"><label>MAs / CMAs</label><input type="number" id="maCount" placeholder="e.g. 2" min="0"></div>
+      <div class="form-group"><label>Charge Nurses</label><input type="number" id="chargeCount" placeholder="e.g. 1" min="0"></div>
+      <div class="form-group"><label>Other Clinical Staff</label><input type="number" id="otherCount" placeholder="e.g. 0" min="0"></div>
+    </div>
+    <div class="divider"></div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Open / Unfilled Positions</label>
+        <input type="number" id="openPositions" placeholder="e.g. 3" min="0">
+      </div>
+      <div class="form-group">
+        <label>Staff Turnover Rate — past 12 months (%)</label>
+        <input type="number" id="turnoverRate" placeholder="e.g. 28" min="0" max="100">
+        <span class="hint">National SNF average: 52% (CMS PBJ data)</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-card">
+    <div class="section-title"><span class="section-icon" style="background:var(--lgold)">💰</span>Current Cost Data</div>
+    <p class="section-sub">Used to calculate the true cost of understaffing. Use approximate figures if exact numbers are unavailable.</p>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Overtime Hours (per pay period)</label>
+        <input type="number" id="otHours" placeholder="e.g. 80" min="0">
+      </div>
+      <div class="form-group">
+        <label>Average RN Hourly Rate</label>
+        <div class="prefix-wrap"><span class="prefix">$</span><input type="number" id="rnRate" placeholder="e.g. 38" min="0"></div>
+        <span class="hint">BLS national median RN: $42/hr (2024)</span>
+      </div>
+      <div class="form-group">
+        <label>Agency / Travel Staff Hours (per month)</label>
+        <input type="number" id="agencyHours" placeholder="e.g. 120" min="0">
+      </div>
+      <div class="form-group">
+        <label>Agency / Travel Staff Hourly Rate</label>
+        <div class="prefix-wrap"><span class="prefix">$</span><input type="number" id="agencyRate" placeholder="e.g. 85" min="0"></div>
+        <span class="hint">Typically 2–3× base rate</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout c-teal">
+    <strong>Why we ask about costs:</strong> Research from AHRQ shows that chronic understaffing costs $40,000–$60,000 per RN departure — far more than the cost of right-staffing. This calculator makes that financial case visible.
+  </div>
+
+  <div class="btn-row">
+    <button class="btn btn-primary" onclick="nextModule()">Continue to Module 2 →</button>
+  </div>
+</div>
+
+<!-- MODULE 2 -->
+<div class="screen" id="screen-1">
+  <h2 class="screen-title">Module 2 — Workload & Staff Wellbeing</h2>
+  <p class="screen-sub">These questions identify burnout risk and workload patterns that affect care quality and staff retention.</p>
+
+  <div class="section-card">
+    <div class="section-title"><span class="section-icon" style="background:var(--lred)">📊</span>Workload Analysis</div>
+    <p class="section-sub">Based on your typical day shift</p>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Average Patients Per Nurse Per Shift</label>
+        <input type="number" id="ptPerNurse" placeholder="e.g. 8" min="1">
+        <span class="hint">ANA recommended: 4–6 for med-surg; CMS SNF target: varies by acuity</span>
+      </div>
+      <div class="form-group">
+        <label>Hours Per Shift on Documentation / Admin</label>
+        <input type="number" id="docHours" placeholder="e.g. 2.5" min="0" step="0.5">
+        <span class="hint">AHRQ: nurses spend 25–35% of shift on documentation</span>
+      </div>
+    </div>
+    <div class="divider"></div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>CMS Five-Star Overall Rating (SNFs only)</label>
+        <select id="fiveStarOverall">
+          <option value="">Select or skip...</option>
+          <option value="1">1 Star</option><option value="2">2 Stars</option>
+          <option value="3">3 Stars</option><option value="4">4 Stars</option><option value="5">5 Stars</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>CMS Staffing Star Rating (SNFs only)</label>
+        <select id="fiveStarStaffing">
+          <option value="">Select or skip...</option>
+          <option value="1">1 Star (below 2.0 NHPPD)</option>
+          <option value="2">2 Stars</option><option value="3">3 Stars</option>
+          <option value="4">4 Stars</option><option value="5">5 Stars (4.1+ NHPPD)</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-card">
+    <div class="section-title"><span class="section-icon" style="background:var(--lred)">🧠</span>Staff Burnout Indicators</div>
+    <p class="section-sub">Answer based on what you observe or hear from your team. Adapted from validated burnout screening frameworks. There are no wrong answers.</p>
+    <div class="yn-wrap">
+      <div class="yn-item">
+        <label>Are staff regularly working through breaks or staying late due to workload?</label>
+        <div class="yn-row"><button class="yn-btn yes" onclick="setYN(this,'b1','yes')">Yes</button><button class="yn-btn no" onclick="setYN(this,'b1','no')">No</button></div>
+      </div>
+      <div class="yn-item">
+        <label>Have you noticed increased irritability, disengagement, or low morale among clinical staff?</label>
+        <div class="yn-row"><button class="yn-btn yes" onclick="setYN(this,'b2','yes')">Yes</button><button class="yn-btn no" onclick="setYN(this,'b2','no')">No</button></div>
+      </div>
+      <div class="yn-item">
+        <label>Has your facility had any near-miss incidents or patient safety concerns in the past 90 days possibly related to staffing?</label>
+        <div class="yn-row"><button class="yn-btn yes" onclick="setYN(this,'b3','yes')">Yes</button><button class="yn-btn no" onclick="setYN(this,'b3','no')">No</button></div>
+      </div>
+      <div class="yn-item">
+        <label>Are staff expressing intent to leave, or have you had departures you attribute to workload?</label>
+        <div class="yn-row"><button class="yn-btn yes" onclick="setYN(this,'b4','yes')">Yes</button><button class="yn-btn no" onclick="setYN(this,'b4','no')">No</button></div>
+      </div>
+      <div class="yn-item">
+        <label>Do staff report feeling unable to provide the level of care they believe patients or residents deserve?</label>
+        <div class="yn-row"><button class="yn-btn yes" onclick="setYN(this,'b5','yes')">Yes</button><button class="yn-btn no" onclick="setYN(this,'b5','no')">No</button></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn btn-secondary" onclick="goTo(0)">← Back</button>
+    <button class="btn btn-gold" onclick="calculate()">Calculate My Right-Staff Model →</button>
+  </div>
+</div>
+
+<!-- RESULTS -->
+<div class="screen" id="screen-2">
+
+  <div class="results-hero">
+    <p class="eyebrow" style="margin-bottom:6px;">ConnectingCare Group · Right-Staff Calculator</p>
+    <h2 style="font-size:24px;margin-bottom:4px;" id="rTitle">Your Facility</h2>
+    <p style="opacity:0.7;font-size:13px;margin-bottom:16px;" id="rSub"></p>
+    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:16px;">
+      <span id="rPill"></span>
+    </div>
+    <div class="stat-row">
+      <div class="stat-item"><div class="stat-label">Current NHPPD</div><div class="stat-value" id="rCurrent" style="color:var(--gold)">--</div></div>
+      <div class="stat-item"><div class="stat-label">Target NHPPD</div><div class="stat-value" id="rTarget" style="color:var(--teal)">--</div></div>
+      <div class="stat-item"><div class="stat-label">FTEs Needed</div><div class="stat-value" id="rFTE" style="color:white">--</div></div>
+      <div class="stat-item"><div class="stat-label">Annual Savings Potential</div><div class="stat-value" id="rSavings" style="color:var(--gold)">--</div></div>
+    </div>
+  </div>
+
+  <!-- Standards comparison -->
+  <div class="section-card">
+    <h3 style="color:var(--navy);margin-bottom:16px;">Staffing Standards Comparison</h3>
+    <div class="results-grid">
+      <div class="rc" style="border-top-color:var(--red)"><p class="rc-lbl">Federal Minimum (CMS)</p><p class="rc-val" id="rcCMS" style="color:var(--red)">--</p><p class="rc-sub" id="rcCMSlbl">NHPPD</p><div class="bar-wrap"><div class="bar" id="bCMS" style="background:var(--red)"></div></div></div>
+      <div class="rc" style="border-top-color:var(--orange)"><p class="rc-lbl">Your Current Performance</p><p class="rc-val" id="rcCur" style="color:var(--orange)">--</p><p class="rc-sub">Current NHPPD</p><div class="bar-wrap"><div class="bar" id="bCur" style="background:var(--orange)"></div></div></div>
+      <div class="rc" style="border-top-color:var(--teal)"><p class="rc-lbl">ANA Recommended</p><p class="rc-val" id="rcANA" style="color:var(--teal)">--</p><p class="rc-sub">ANA Principles 2022</p><div class="bar-wrap"><div class="bar" id="bANA" style="background:var(--teal)"></div></div></div>
+      <div class="rc" style="border-top-color:var(--green)"><p class="rc-lbl">Right-Staff Target</p><p class="rc-val" id="rcRS" style="color:var(--green)">--</p><p class="rc-sub">Optimal for your census and acuity</p><div class="bar-wrap"><div class="bar" id="bRS" style="background:var(--green)"></div></div></div>
+    </div>
+  </div>
+
+  <!-- Cost analysis -->
+  <div class="section-card">
+    <h3 style="color:var(--navy);margin-bottom:6px;">True Cost: Understaffing vs. Right-Staffing</h3>
+    <p style="font-size:13px;color:var(--gray);margin-bottom:16px;">Chronic understaffing costs more than right-staffing when overtime, agency premiums, and turnover are calculated together. (AHRQ, BLS, CMS PBJ)</p>
+    <table class="cost-tbl">
+      <thead><tr><th>Cost Category</th><th>Current (Annual)</th><th>At Right-Staffing</th><th>Net Impact</th></tr></thead>
+      <tbody id="costBody"></tbody>
+    </table>
+  </div>
+
+  <!-- Burnout -->
+  <div class="section-card"><h3 style="color:var(--navy);margin-bottom:12px;">Staff Wellbeing Assessment</h3><div id="burnoutDiv"></div></div>
+
+  <!-- Five Star -->
+  <div class="section-card" id="fiveStarDiv" style="display:none;"><h3 style="color:var(--navy);margin-bottom:12px;">CMS Five-Star Staffing Projection</h3><div id="fiveStarContent"></div></div>
+
+  <!-- Action Brief -->
+  <div class="action-box">
+    <h3>Your Right-Staff Action Brief</h3>
+    <div id="actions"></div>
+    <div class="divider" style="background:#e0c080;margin:20px 0;"></div>
+    <h4 style="color:var(--navy);margin-bottom:12px;font-size:15px;">90-Day Right-Staffing Roadmap</h4>
+    <div class="roadmap">
+      <div class="rp"><h4>Days 1–30: Assessment</h4><ul id="rm30"></ul></div>
+      <div class="rp"><h4>Days 31–60: Implementation</h4><ul id="rm60"></ul></div>
+      <div class="rp"><h4>Days 61–90: Optimization</h4><ul id="rm90"></ul></div>
+    </div>
+  </div>
+
+  <!-- CTA -->
+  <div class="cta-box">
+    <h3>Want a full staffing intelligence report?</h3>
+    <p>ConnectingCare Group can prepare a complete Right-Staff Analysis — role-by-role recommendations, financial case for administration, phased implementation roadmap — tailored to your specific setting and state requirements.</p>
+    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+      <a href="mailto:partners@connectingcaregroup.com?subject=Right-Staff Calculator — Full Analysis Request" class="btn btn-primary" style="text-decoration:none;">Request Full Analysis</a>
+      <a href="https://connectingcaregroup.com/contact" class="btn" style="text-decoration:none;background:transparent;color:white;border:2px solid white;" target="_blank">Schedule a Conversation</a>
+    </div>
+  </div>
+
+  <div class="disclaimer">
+    <strong>ConnectingCare Group · Right-Staff Calculator</strong><br>
+    Benchmarks sourced from: CMS 42 CFR 483.35 · ANA Principles for Nurse Staffing (2022) · AONL Nurse Staffing Benchmarks · AHRQ Patient Safety Research on Nurse Staffing and Outcomes · CMS Payroll-Based Journal (PBJ) national staffing data · Bureau of Labor Statistics OEWS 2024 · AHRQ nursing turnover cost research ($40,000–$60,000 per RN departure). Financial calculations are estimates based on nationally published benchmarks and the data entered. Actual costs vary by market, contract terms, and organizational context. Results are for operational planning purposes only and do not constitute legal, HR, regulatory, or clinical advice. ConnectingCare Group (CCG) — connectingcaregroup.com · partners@connectingcaregroup.com
+  </div>
+
+  <div class="btn-row no-print">
+    <button class="btn btn-secondary" onclick="window.print()">🖨 Print / Save as PDF</button>
+    <button class="btn btn-secondary" onclick="location.reload()">Start New Calculation</button>
+  </div>
+</div>
+</div>
+
+<script>
+const yn={};
+let cur=0;
+
+const bench={
+  snf:    {cmsMin:2.0,ana:4.1,rs:4.1,lbl:'Nursing Hours Per Resident Per Day (NHPPD)',am:{l:3.5,m:4.1,h:5.0,c:6.5}},
+  ltach:  {cmsMin:2.5,ana:5.5,rs:5.5,lbl:'Nursing Hours Per Patient Day',am:{l:4.0,m:5.5,h:7.0,c:9.0}},
+  al:     {cmsMin:0.5,ana:2.0,rs:2.0,lbl:'Care Hours Per Resident Per Day',am:{l:1.5,m:2.0,h:2.8,c:3.5}},
+  mc:     {cmsMin:0.5,ana:2.5,rs:2.5,lbl:'Care Hours Per Resident Per Day',am:{l:2.0,m:2.5,h:3.2,c:4.0}},
+  medsurg:{cmsMin:null,ana:4.0,rs:4.0,lbl:'Nursing Hours Per Patient Day',am:{l:3.0,m:4.0,h:5.5,c:8.0}},
+  icu:    {cmsMin:null,ana:8.0,rs:8.0,lbl:'Nursing Hours Per Patient Day',am:{l:6.0,m:8.0,h:10.0,c:12.0}},
+  ed:     {cmsMin:null,ana:3.5,rs:3.5,lbl:'Nursing Hours Per Patient Day',am:{l:2.5,m:3.5,h:5.0,c:7.0}},
+  fqhc:   {cmsMin:null,ana:null,rs:2.0,lbl:'Staff-to-Provider Ratio',am:{l:1.5,m:2.0,h:2.5,c:3.0}},
+  practice:{cmsMin:null,ana:null,rs:1.5,lbl:'Staff-to-Provider Ratio',am:{l:1.2,m:1.5,h:2.0,c:2.5}},
+  rhc:    {cmsMin:null,ana:null,rs:1.8,lbl:'Staff-to-Provider Ratio',am:{l:1.5,m:1.8,h:2.2,c:2.8}},
+};
+
+const labels={snf:'Skilled Nursing Facility',ltach:'LTACH',al:'Assisted Living',mc:'Memory Care',medsurg:'Hospital Med-Surg',icu:'Hospital ICU',ed:'Emergency Dept',fqhc:'FQHC',practice:'Independent Practice',rhc:'Rural Health Clinic'};
+
+function setYN(btn,key,val){
+  btn.closest('.yn-row').querySelectorAll('.yn-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  yn[key]=val;
+}
+
+function updateDefaults(){
+  const t=document.getElementById('facilityType').value;
+  const defs={snf:{l:15,m:45,h:30,c:10},ltach:{l:5,m:25,h:45,c:25},al:{l:40,m:45,h:12,c:3},mc:{l:20,m:45,h:28,c:7},medsurg:{l:20,m:50,h:25,c:5},icu:{l:0,m:10,h:45,c:45},fqhc:{l:50,m:35,h:12,c:3},practice:{l:55,m:35,h:8,c:2}};
+  if(defs[t]){const d=defs[t];document.getElementById('acuityLow').value=d.l;document.getElementById('acuityMod').value=d.m;document.getElementById('acuityHigh').value=d.h;document.getElementById('acuityCrit').value=d.c;}
+}
+
+function nextModule(){
+  const census=parseInt(document.getElementById('currentCensus').value);
+  const type=document.getElementById('facilityType').value;
+  if(!type||!census){alert('Please enter your facility type and current census to continue.');return;}
+  goTo(1);
+}
+
+function goTo(n){
+  document.getElementById('screen-'+cur).classList.remove('active');
+  document.getElementById('screen-'+n).classList.add('active');
+  cur=n;
+  const pct=n===0?0:n===1?50:100;
+  document.getElementById('progressBar').style.width=pct+'%';
+  document.getElementById('progressText').textContent=n<2?'Module '+(n+1)+' of 2':'Results';
+  document.getElementById('progressPct').textContent=pct+'%';
+  window.scrollTo(0,0);
+}
+
+function fmt(n){return parseFloat(n).toLocaleString('en-US',{maximumFractionDigits:1});}
+function fmtM(n){return'$'+Math.round(n).toLocaleString();}
+
+function stars(n){
+  return Array.from({length:5},(_,i)=>`<span class="${i<n?'star-filled':'star-empty'}">★</span>`).join('');
+}
+
+function calculate(){
+  const type=document.getElementById('facilityType').value||'snf';
+  const census=parseInt(document.getElementById('currentCensus').value)||80;
+  const low=parseInt(document.getElementById('acuityLow').value)||25;
+  const mod=parseInt(document.getElementById('acuityMod').value)||50;
+  const high=parseInt(document.getElementById('acuityHigh').value)||20;
+  const crit=parseInt(document.getElementById('acuityCrit').value)||5;
+  const rn=parseFloat(document.getElementById('rnCount').value)||0;
+  const lpn=parseFloat(document.getElementById('lpnCount').value)||0;
+  const cna=parseFloat(document.getElementById('cnaCount').value)||0;
+  const ma=parseFloat(document.getElementById('maCount').value)||0;
+  const charge=parseFloat(document.getElementById('chargeCount').value)||0;
+  const openPos=parseInt(document.getElementById('openPositions').value)||0;
+  const turnover=parseFloat(document.getElementById('turnoverRate').value)||30;
+  const otH=parseFloat(document.getElementById('otHours').value)||0;
+  const rnRate=parseFloat(document.getElementById('rnRate').value)||42;
+  const agH=parseFloat(document.getElementById('agencyHours').value)||0;
+  const agRate=parseFloat(document.getElementById('agencyRate').value)||rnRate*2.2;
+  const fiveStarOv=document.getElementById('fiveStarOverall').value;
+  const fiveStarSt=document.getElementById('fiveStarStaffing').value;
+
+  const b=bench[type]||bench['snf'];
+
+  // Acuity-adjusted target
+  const acuityAdj=(low/100*b.am.l+mod/100*b.am.m+high/100*b.am.h+crit/100*b.am.c);
+  const target=Math.max(b.rs,acuityAdj);
+
+  // Current NHPPD (12hr shifts x 2 shifts = 24hr)
+  const nurseStaff=rn+lpn+cna;
+  const currentNHPPD=census>0?(nurseStaff*12)/census:0;
+
+  // FTE gap
+  const reqFTEperShift=(target*census)/12/2;
+  const gap=Math.max(0,reqFTEperShift-nurseStaff);
+  const newFTEs=Math.ceil(gap*2*365/260);
+
+  // Status
+  const ratio=currentNHPPD/target;
+  let status,pillClass;
+  if(ratio>=0.95){status='Safe';pillClass='pill-safe';}
+  else if(ratio>=0.80){status='Caution';pillClass='pill-caution';}
+  else if(ratio>=0.65){status='Unsafe';pillClass='pill-unsafe';}
+  else{status='Critical';pillClass='pill-critical';}
+
+  // Costs — understaffing
+  const otCost=otH*26*(rnRate*0.5);
+  const agCost=agH*12*agRate;
+  const totalClinical=rn+lpn+cna+ma+charge;
+  const rnPct=totalClinical>0?rn/totalClinical:0.4;
+  const tcRN=totalClinical*rnPct*(turnover/100)*52000;
+  const tcOther=totalClinical*(1-rnPct)*(turnover/100)*14000;
+  const safePrem=status==='Critical'?census*800:status==='Unsafe'?census*400:census*150;
+  const totalUnder=otCost+agCost+tcRN+tcOther+safePrem;
+
+  // Costs — right-staffing
+  const newStaffCost=newFTEs*rnRate*0.75*2080;
+  const rsOT=otCost*0.25;
+  const rsAg=agCost*0.2;
+  const rsTurn=(tcRN+tcOther)*0.45;
+  const rsSafe=safePrem*0.15;
+  const totalRS=newStaffCost+rsOT+rsAg+rsTurn+rsSafe;
+  const savings=totalUnder-totalRS;
+
+  // Burnout
+  const bYes=['b1','b2','b3','b4','b5'].filter(k=>yn[k]==='yes').length;
+  let blevel,btext;
+  if(bYes<=1){blevel='Low';btext='Staff wellbeing indicators are generally positive. Monitor proactively.';}
+  else if(bYes<=2){blevel='Moderate';btext='Some burnout indicators present. Proactive workload review and staff engagement recommended.';}
+  else if(bYes<=3){blevel='High';btext='Significant burnout risk. Staff wellbeing interventions should accompany any staffing changes.';}
+  else{blevel='Critical';btext='Critical burnout risk. Immediate staffing review and staff support interventions are strongly recommended. High risk of accelerated turnover.';}
+
+  // ---- UPDATE UI ----
+  document.getElementById('rTitle').textContent=labels[type]||'Your Facility';
+  document.getElementById('rSub').textContent=`Census: ${census} | Current staff/shift: ${rn+lpn+cna+ma+charge} | Open positions: ${openPos} | Turnover: ${turnover}%`;
+  document.getElementById('rPill').innerHTML=`<span class="pill ${pillClass}">${status}</span>`;
+  document.getElementById('rCurrent').textContent=fmt(currentNHPPD);
+  document.getElementById('rTarget').textContent=fmt(target);
+  document.getElementById('rFTE').textContent=gap>0?'+'+Math.ceil(gap*2)+' per shift':'Adequate';
+  document.getElementById('rSavings').textContent=savings>0?fmtM(savings)+'/yr':'See breakdown';
+
+  // Standards
+  document.getElementById('rcCMS').textContent=b.cmsMin?fmt(b.cmsMin):'N/A';
+  document.getElementById('rcCMSlbl').textContent=b.lbl;
+  document.getElementById('rcCur').textContent=fmt(currentNHPPD);
+  document.getElementById('rcANA').textContent=b.ana?fmt(b.ana):fmt(b.rs);
+  document.getElementById('rcRS').textContent=fmt(target);
+  const mx=Math.max(target,currentNHPPD,b.ana||0)*1.1;
+  document.getElementById('bCMS').style.width=b.cmsMin?((b.cmsMin/mx)*100)+'%':'0%';
+  document.getElementById('bCur').style.width=((currentNHPPD/mx)*100)+'%';
+  document.getElementById('bANA').style.width=b.ana?((b.ana/mx)*100)+'%':'0%';
+  document.getElementById('bRS').style.width=((target/mx)*100)+'%';
+
+  // Cost table
+  const rows=[
+    ['Overtime Premium',fmtM(otCost),fmtM(rsOT),fmtM(otCost-rsOT)],
+    ['Agency / Travel Premium',fmtM(agCost),fmtM(rsAg),fmtM(agCost-rsAg)],
+    ['Staff Turnover Cost',fmtM(tcRN+tcOther),fmtM(rsTurn),fmtM((tcRN+tcOther)-rsTurn)],
+    ['Patient Safety Risk Premium',fmtM(safePrem),fmtM(rsSafe),fmtM(safePrem-rsSafe)],
+    ['New Staff Investment','$0',fmtM(newStaffCost),fmtM(-newStaffCost)],
+    ['TOTAL ANNUAL COST',fmtM(totalUnder),fmtM(totalRS),(savings>0?'💚 Net Savings: ':'💰 Net Investment: ')+fmtM(Math.abs(savings))],
+  ];
+  document.getElementById('costBody').innerHTML=rows.map(([l,c,r,n],i)=>{
+    const last=i===rows.length-1;
+    return`<tr><td>${l}</td><td${last?' style="font-weight:700"':''}>${c}</td><td${last?' style="font-weight:700"':''}>${r}</td><td class="${last?(savings>0?'pos':'neg'):''}">${n}</td></tr>`;
+  }).join('');
+
+  // Burnout
+  const burnoutColors={Low:'var(--green)',Moderate:'#8B6914',High:'var(--orange)',Critical:'var(--red)'};
+  const burnoutBGs={Low:'var(--lgreen)',Moderate:'var(--lgold)',High:'#FEF0D8',Critical:'var(--lred)'};
+  document.getElementById('burnoutDiv').innerHTML=`
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;">
+      <span class="pill" style="background:${burnoutBGs[blevel]};color:${burnoutColors[blevel]};font-size:14px;padding:6px 18px;">${blevel} Burnout Risk</span>
+      <span style="font-size:13px;color:var(--gray);">${bYes} of 5 indicators present</span>
+    </div>
+    <p style="font-size:14px;color:var(--gray);line-height:1.7;">${btext}</p>
+    ${bYes>=3?`<div class="callout c-red" style="margin-top:12px;"><strong>Recommended immediate actions:</strong> Conduct stay interviews with clinical staff within 30 days. Review scheduling for involuntary overtime. Consider a formal staff recognition program. Contact ConnectingCare Group for a consultation.</div>`:''}`;
+
+  // Five Star
+  if(fiveStarOv||fiveStarSt){
+    document.getElementById('fiveStarDiv').style.display='block';
+    const curStars=currentNHPPD>=4.1?5:currentNHPPD>=3.5?4:currentNHPPD>=2.5?3:currentNHPPD>=2.0?2:1;
+    const projStars=target>=4.1?5:target>=3.5?4:3;
+    document.getElementById('fiveStarContent').innerHTML=`
+      <div class="form-grid">
+        <div><p style="font-size:13px;font-weight:600;color:var(--gray);margin-bottom:4px;">Current Staffing Stars (Estimated)</p><div class="star-row">${stars(curStars)}</div><p style="font-size:12px;color:var(--gray);margin-top:4px;">Based on ${fmt(currentNHPPD)} NHPPD</p></div>
+        <div><p style="font-size:13px;font-weight:600;color:var(--gray);margin-bottom:4px;">Projected at Right-Staffing</p><div class="star-row">${stars(projStars)}</div><p style="font-size:12px;color:var(--gray);margin-top:4px;">Based on ${fmt(target)} NHPPD target</p></div>
+      </div>
+      <div class="callout c-teal" style="margin-top:12px;"><strong>Census impact:</strong> Each additional staffing star is associated with a 3–5% increase in occupancy for SNFs (CMS Five-Star research). For your ${census}-bed facility, that could mean ${Math.round(census*0.04)} additional residents at full deployment.</div>`;
+  }
+
+  // Actions
+  const acts=[];
+  if(gap>0)acts.push(`<strong>Close the staffing gap:</strong> Your facility needs approximately ${Math.ceil(gap*2)} additional clinical FTEs across shifts to reach the right-staffing target of ${fmt(target)} NHPPD. Prioritize RN and CNA/aide hiring based on your acuity mix.`);
+  if(agH>0)acts.push(`<strong>Reduce agency dependency:</strong> Your current agency/travel staff cost is approximately ${fmtM(agCost)} annually — at roughly ${fmtM(agRate)}/hr. A structured hiring plan for permanent staff could reduce this by 70–80% within 90 days.`);
+  if(turnover>30)acts.push(`<strong>Address staff retention:</strong> Your ${turnover}% turnover rate is costing approximately ${fmtM(tcRN+tcOther)} annually (AHRQ benchmark: $40K–$60K per RN departure). A stay interview program and scheduling flexibility review are the highest-ROI first steps.`);
+  if(bYes>=3)acts.push(`<strong>Address burnout urgently:</strong> ${bYes} of 5 burnout indicators are present. Staff wellbeing interventions must begin alongside — not after — staffing improvements.`);
+  if(acts.length===0)acts.push(`<strong>Maintain and monitor:</strong> Your staffing is near or at the right-staff target. Focus on retention strategies to sustain this level as your census changes.`);
+  document.getElementById('actions').innerHTML=acts.map((a,i)=>`<div class="a-item"><div class="a-num">${i+1}</div><div class="a-text">${a}</div></div>`).join('');
+
+  // Roadmap
+  document.getElementById('rm30').innerHTML=['Conduct stay interviews with all clinical staff','Complete staffing gap analysis by role and shift','Review scheduling practices for involuntary overtime','Post open positions with competitive compensation'].map(i=>`<li>${i}</li>`).join('');
+  document.getElementById('rm60').innerHTML=['Begin hiring process for priority roles','Implement scheduling adjustments to reduce overtime','Reduce agency hours by 40% as permanent hires onboard','Launch staff recognition program'].map(i=>`<li>${i}</li>`).join('');
+  document.getElementById('rm90').innerHTML=['Full right-staffing model in place','Re-measure NHPPD and compare to target','Conduct 90-day retention check-in with staff','Document outcomes for CMS Five-Star submission'].map(i=>`<li>${i}</li>`).join('');
+
+  goTo(2);
+}
+</script>
+</body>
+</html>

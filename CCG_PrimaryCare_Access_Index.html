@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Primary & Community Care Access Index — ConnectingCare Group</title>
+<link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;600;700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#1B2A4A;--teal:#0D7B8A;--gold:#C9963A;--green:#1A7A4A;
+  --red:#C0392B;--gray:#4A5568;--lgray:#F1F4F8;--white:#ffffff;
+  --lgold:#FEF6E8;--lgreen:#E8F5EE;--lred:#FDECEA;--lblue:#EAF3FB;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',sans-serif;background:var(--lgray);color:var(--gray);line-height:1.6;}
+h1,h2,h3,h4{font-family:'Lora',serif;}
+.header{background:var(--navy);}
+.header-inner{max-width:900px;margin:0 auto;padding:36px 24px;}
+.eyebrow{font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--teal);margin-bottom:10px;}
+.header h1{font-size:clamp(24px,4vw,40px);color:white;font-weight:700;line-height:1.2;margin-bottom:10px;}
+.header-sub{color:rgba(255,255,255,0.72);font-size:15px;max-width:620px;line-height:1.7;}
+.badges{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px;}
+.badge{background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.8);padding:4px 12px;border-radius:20px;font-size:11px;font-weight:600;}
+.progress-wrap{background:rgba(255,255,255,0.1);height:4px;}
+.progress-bar{background:var(--teal);height:4px;transition:width 0.4s ease;width:0%;}
+.progress-meta{max-width:900px;margin:0 auto;padding:8px 24px;display:flex;justify-content:space-between;align-items:center;}
+.progress-text{font-size:12px;color:rgba(255,255,255,0.6);}
+.step-dots{display:flex;gap:6px;}
+.step-dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,0.2);transition:all 0.3s;}
+.step-dot.active{background:var(--teal);}
+.step-dot.done{background:var(--green);}
+.main{max-width:900px;margin:0 auto;padding:32px 24px 80px;}
+.screen{display:none;}
+.screen.active{display:block;}
+.screen-title{font-size:26px;font-weight:700;color:var(--navy);margin-bottom:6px;}
+.screen-sub{font-size:15px;color:var(--gray);margin-bottom:28px;max-width:640px;}
+.domain-header{background:white;border-radius:14px;padding:24px;margin-bottom:24px;border-left:5px solid var(--teal);}
+.domain-eyebrow{font-size:10px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:var(--teal);margin-bottom:6px;}
+.domain-title{font-size:22px;font-weight:700;color:var(--navy);margin-bottom:6px;}
+.domain-source{font-size:12px;color:var(--gray);opacity:0.7;}
+.question-card{background:white;border-radius:12px;padding:24px;margin-bottom:16px;border:1px solid #e8e8e8;}
+.q-num{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--teal);margin-bottom:8px;}
+.q-text{font-size:15px;font-weight:600;color:var(--navy);margin-bottom:16px;line-height:1.5;}
+.options{display:flex;flex-direction:column;gap:10px;}
+.opt{display:flex;align-items:flex-start;gap:12px;padding:12px 16px;border:1.5px solid #e0e0e0;border-radius:10px;cursor:pointer;transition:all 0.2s;}
+.opt:hover{border-color:var(--teal);background:var(--lblue);}
+.opt.selected{border-color:var(--teal);background:var(--lblue);}
+.opt-letter{width:28px;height:28px;border-radius:50%;background:var(--lgray);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--navy);flex-shrink:0;transition:all 0.2s;}
+.opt.selected .opt-letter{background:var(--teal);color:white;}
+.opt-text{font-size:14px;color:var(--gray);line-height:1.5;padding-top:3px;}
+.form-section{background:white;border-radius:14px;padding:28px;margin-bottom:20px;border:1px solid #e8e8e8;}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+@media(max-width:600px){.form-grid{grid-template-columns:1fr;}}
+.form-group{display:flex;flex-direction:column;gap:6px;}
+.form-group.full{grid-column:1/-1;}
+label{font-size:13px;font-weight:600;color:var(--navy);}
+.hint{font-weight:400;color:var(--gray);font-size:12px;}
+input[type=text],input[type=email],select{padding:10px 14px;border:1.5px solid #d0d0d0;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:14px;color:var(--gray);transition:border-color 0.2s;width:100%;}
+input:focus,select:focus{outline:none;border-color:var(--teal);}
+.checkbox-group{display:flex;flex-direction:column;gap:8px;margin-top:4px;}
+.checkbox-item{display:flex;align-items:center;gap:10px;padding:10px 14px;border:1.5px solid #e0e0e0;border-radius:8px;cursor:pointer;transition:all 0.2s;}
+.checkbox-item:hover{border-color:var(--teal);background:var(--lblue);}
+.checkbox-item input[type=checkbox]{width:16px;height:16px;accent-color:var(--teal);}
+.checkbox-item label{font-size:14px;color:var(--gray);cursor:pointer;margin:0;}
+.callout{border-radius:10px;padding:14px 18px;margin:14px 0;font-size:14px;line-height:1.6;}
+.callout-teal{background:var(--lblue);border-left:4px solid var(--teal);color:var(--navy);}
+.callout-gold{background:var(--lgold);border-left:4px solid var(--gold);color:var(--navy);}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:12px 28px;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;border:none;transition:all 0.2s;text-decoration:none;}
+.btn-primary{background:var(--teal);color:white;}
+.btn-primary:hover{background:#0a6575;}
+.btn-secondary{background:white;color:var(--navy);border:2px solid var(--navy);}
+.btn-secondary:hover{background:var(--navy);color:white;}
+.btn-gold{background:var(--gold);color:white;}
+.btn-gold:hover{background:#a87d2e;}
+.btn-row{display:flex;gap:12px;margin-top:28px;flex-wrap:wrap;}
+.section-divider{height:2px;background:linear-gradient(90deg,var(--teal),transparent);margin:24px 0;border-radius:1px;}
+/* RESULTS */
+.results-hero{background:var(--navy);border-radius:14px;padding:32px;color:white;margin-bottom:24px;}
+.score-wrap{display:flex;align-items:center;gap:24px;flex-wrap:wrap;margin:20px 0;}
+.score-circle{width:100px;height:100px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;border:4px solid;flex-shrink:0;}
+.score-num{font-family:'Lora',serif;font-size:32px;font-weight:700;line-height:1;}
+.score-sub-label{font-size:10px;letter-spacing:1px;text-transform:uppercase;margin-top:2px;}
+.band-label{font-size:20px;font-weight:700;margin-bottom:6px;}
+.band-desc{font-size:14px;opacity:0.8;line-height:1.6;}
+.domain-results{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;margin-bottom:24px;}
+.domain-result-card{background:white;border-radius:12px;padding:20px;border-top:4px solid;}
+.dr-label{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gray);margin-bottom:6px;}
+.dr-title{font-size:14px;font-weight:600;color:var(--navy);margin-bottom:12px;}
+.dr-score-row{display:flex;align-items:center;gap:12px;margin-bottom:8px;}
+.dr-score{font-size:28px;font-weight:700;font-family:'Lora',serif;}
+.dr-bar-wrap{flex:1;height:8px;background:var(--lgray);border-radius:4px;overflow:hidden;}
+.dr-bar{height:8px;border-radius:4px;}
+.dr-status{font-size:11px;font-weight:700;padding:2px 10px;border-radius:10px;display:inline-block;}
+.action-brief{background:var(--lgold);border-radius:14px;padding:24px;margin-bottom:24px;border-left:5px solid var(--gold);}
+.action-item{display:flex;gap:12px;margin-bottom:12px;align-items:flex-start;}
+.action-num{width:28px;height:28px;border-radius:50%;background:var(--gold);color:white;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0;margin-top:2px;}
+.action-text{font-size:14px;color:var(--gray);line-height:1.6;}
+.action-text strong{color:var(--navy);}
+.readiness-box{border-radius:12px;padding:20px 24px;margin-bottom:24px;}
+.cta-section{background:var(--teal);border-radius:14px;padding:32px;color:white;text-align:center;margin-bottom:24px;}
+.cta-section h3{font-size:22px;margin-bottom:10px;}
+.cta-section p{opacity:0.85;margin-bottom:20px;}
+.three-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:16px;}
+@media(max-width:600px){.three-cards{grid-template-columns:1fr;}}
+.cta-card{background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);border-radius:10px;padding:16px;text-align:left;}
+.cta-card-title{font-size:13px;font-weight:700;color:white;margin-bottom:6px;}
+.cta-card-body{font-size:12px;color:rgba(255,255,255,0.8);line-height:1.5;margin-bottom:12px;}
+.disclaimer{background:white;border-radius:12px;padding:20px;font-size:12px;color:var(--gray);line-height:1.7;border:1px solid #e8e8e8;}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-inner">
+    <p class="eyebrow">ConnectingCare Group · Primary & Community Care Intelligence</p>
+    <h1>Primary & Community Care<br>Access Index</h1>
+    <p class="header-sub">A structured assessment measuring your organization's access performance across five operational domains — benchmarked against HRSA UDS 2024 national averages. Free. No signup required. Instant results.</p>
+    <div class="badges">
+      <span class="badge">HRSA UDS 2024 Benchmarks</span>
+      <span class="badge">SAMHSA · NACHC · AAFP · CMS</span>
+      <span class="badge">5 Operational Domains</span>
+      <span class="badge">Instant Results</span>
+      <span class="badge">FQHCs · Rural Clinics · Community Health</span>
+      <span class="badge">~15 Minutes</span>
+    </div>
+  </div>
+  <div class="progress-wrap"><div class="progress-bar" id="progressBar"></div></div>
+  <div class="progress-meta">
+    <span class="progress-text" id="progressText">Step 1 of 8</span>
+    <div class="step-dots" id="stepDots">
+      <div class="step-dot active" title="Intake"></div>
+      <div class="step-dot" title="Domain 1"></div>
+      <div class="step-dot" title="Domain 2"></div>
+      <div class="step-dot" title="Domain 3"></div>
+      <div class="step-dot" title="Domain 4"></div>
+      <div class="step-dot" title="Domain 5"></div>
+      <div class="step-dot" title="Readiness"></div>
+      <div class="step-dot" title="Results"></div>
+    </div>
+  </div>
+</div>
+
+<div class="main">
+
+<!-- SCREEN 0: INTAKE -->
+<div class="screen active" id="screen-0">
+  <h2 class="screen-title">Tell us about your organization</h2>
+  <p class="screen-sub">Optional — improves benchmarking and allows ConnectingCare Group to send your full report with recommendations.</p>
+  <div class="form-section">
+    <div class="form-grid">
+      <div class="form-group full">
+        <label>Organization Name <span class="hint">(optional)</span></label>
+        <input type="text" id="orgName" placeholder="e.g. Riverside Community Health Center">
+      </div>
+      <div class="form-group">
+        <label>Organization Type</label>
+        <select id="orgType">
+          <option value="fqhc">FQHC / Community Health Center</option>
+          <option value="rural">Rural Health Clinic</option>
+          <option value="practice">Independent Practice (NP/DNP-led)</option>
+          <option value="faith">Faith-Based / Nonprofit Health Program</option>
+          <option value="disease">Disease Management Program</option>
+          <option value="other">Other Community Health Organization</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>State <span class="hint">(optional)</span></label>
+        <select id="orgState">
+          <option value="">Select state...</option>
+          <option value="GA">Georgia</option>
+          <option value="NC">North Carolina</option>
+          <option value="KY">Kentucky</option>
+          <option value="AL">Alabama</option>
+          <option value="FL">Florida</option>
+          <option value="SC">South Carolina</option>
+          <option value="TN">Tennessee</option>
+          <option value="VA">Virginia</option>
+          <option value="other">Other state</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Your Role <span class="hint">(optional)</span></label>
+        <select id="userRole">
+          <option value="">Select role...</option>
+          <option>Clinic Director / CEO</option>
+          <option>Medical Director / CMO</option>
+          <option>Operations Director / COO</option>
+          <option>Care Coordinator</option>
+          <option>Billing / Revenue Cycle</option>
+          <option>Front Desk / Scheduling</option>
+          <option>Provider (NP, DNP, MD, DO)</option>
+          <option>Other</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Contact Email <span class="hint">(for full report + recommendations)</span></label>
+        <input type="email" id="contactEmail" placeholder="your@clinic.org">
+      </div>
+      <div class="form-group">
+        <label>Weekly Scheduled Appointments <span class="hint">(estimate)</span></label>
+        <select id="weeklyAppts">
+          <option value="75">Under 100</option>
+          <option value="150">100–200</option>
+          <option value="350" selected>201–400</option>
+          <option value="600">401–700</option>
+          <option value="900">700+</option>
+        </select>
+      </div>
+    </div>
+    <div class="callout callout-teal" style="margin-top:16px;">
+      <strong>Want your full report?</strong> Enter your email above and ConnectingCare Group will send you a scored report with 1–2 evidence-based recommendations benchmarked against HRSA, Press Ganey, and NACHC standards — delivered within 5 business days. No cost. No commitment.
+    </div>
+  </div>
+  <div class="btn-row">
+    <button class="btn btn-primary" onclick="goTo(1)">Start the Assessment →</button>
+  </div>
+</div>
+
+<!-- SCREEN 1: DOMAIN 1 — ELIGIBILITY VERIFICATION -->
+<div class="screen" id="screen-1">
+  <div class="domain-header">
+    <p class="domain-eyebrow">Domain 1 of 5</p>
+    <h2 class="domain-title">Eligibility Verification</h2>
+    <p class="domain-source">Federal standards: HRSA UDS 2024 · No Surprises Act (Pub. L. 116-260) · CMS Medicaid Managed Care Rules · HRSA Sliding Fee Discount Program (42 CFR Part 51c)</p>
+  </div>
+
+  <div class="question-card">
+    <p class="q-num">Question 1-1</p>
+    <p class="q-text">How does your clinic verify patient eligibility and estimate patient cost responsibility before appointments?</p>
+    <div class="options" data-q="d1_1">
+      <div class="opt" onclick="sel(this,'d1_1',100)"><div class="opt-letter">A</div><div class="opt-text">We verify eligibility before every appointment and provide a cost estimate to the patient in advance</div></div>
+      <div class="opt" onclick="sel(this,'d1_1',70)"><div class="opt-letter">B</div><div class="opt-text">We verify eligibility for most patients but don't consistently share cost estimates in advance</div></div>
+      <div class="opt" onclick="sel(this,'d1_1',40)"><div class="opt-letter">C</div><div class="opt-text">We verify eligibility at check-in — patients often learn their cost responsibility at the desk</div></div>
+      <div class="opt" onclick="sel(this,'d1_1',15)"><div class="opt-letter">D</div><div class="opt-text">Eligibility verification is inconsistent — errors and surprises at the desk are common</div></div>
+    </div>
+  </div>
+
+  <div class="question-card">
+    <p class="q-num">Question 1-2</p>
+    <p class="q-text">How effectively does your clinic identify and enroll eligible patients in your sliding fee discount program?</p>
+    <div class="options" data-q="d1_2">
+      <div class="opt" onclick="sel(this,'d1_2',100)"><div class="opt-letter">A</div><div class="opt-text">Systematically — we screen every new patient and update sliding fee status annually</div></div>
+      <div class="opt" onclick="sel(this,'d1_2',70)"><div class="opt-letter">B</div><div class="opt-text">Mostly — we screen new patients but updates are inconsistent</div></div>
+      <div class="opt" onclick="sel(this,'d1_2',40)"><div class="opt-letter">C</div><div class="opt-text">Inconsistently — some patients fall through and aren't offered the sliding fee program</div></div>
+      <div class="opt" onclick="sel(this,'d1_2',15)"><div class="opt-letter">D</div><div class="opt-text">Poorly — sliding fee enrollment is a known gap at our clinic</div></div>
+    </div>
+  </div>
+
+  <div class="question-card">
+    <p class="q-num">Question 1-3</p>
+    <p class="q-text">When a patient's Medicaid coverage lapses or changes, how quickly does your clinic identify and address the gap?</p>
+    <div class="options" data-q="d1_3">
+      <div class="opt" onclick="sel(this,'d1_3',100)"><div class="opt-letter">A</div><div class="opt-text">Proactively — we identify coverage lapses before appointments and help patients re-enroll</div></div>
+      <div class="opt" onclick="sel(this,'d1_3',65)"><div class="opt-letter">B</div><div class="opt-text">At check-in — we catch most lapses at the front desk before the visit</div></div>
+      <div class="opt" onclick="sel(this,'d1_3',35)"><div class="opt-letter">C</div><div class="opt-text">Reactively — we often discover lapses after services are rendered</div></div>
+      <div class="opt" onclick="sel(this,'d1_3',15)"><div class="opt-letter">D</div><div class="opt-text">Coverage lapse management is a significant revenue and access problem for us</div></div>
+    </div>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn btn-secondary" onclick="goTo(0)">← Back</button>
+    <button class="btn btn-primary" onclick="goTo(2)">Domain 2 →</button>
+  </div>
+</div>
+
+<!-- SCREEN 2: DOMAIN 2 — PRIOR AUTH -->
+<div class="screen" id="screen-2">
+  <div class="domain-header">
+    <p class="domain-eyebrow">Domain 2 of 5</p>
+    <h2 class="domain-title">Prior Authorization Workflow</h2>
+    <p class="domain-source">Federal standards: CMS Prior Authorization Rules (42 CFR 438) · HRSA T/TA Access Measures · AAFP Care Coordination Standards · NACHC Referral Completion Benchmarks</p>
+  </div>
+
+  <div class="question-card">
+    <p class="q-num">Question 2-1</p>
+    <p class="q-text">How does your clinic track and manage prior authorization requests for specialist referrals and procedures?</p>
+    <div class="options" data-q="d2_1">
+      <div class="opt" onclick="sel(this,'d2_1',100)"><div class="opt-letter">A</div><div class="opt-text">Structured system — all authorizations are tracked from request to approval with follow-up protocols</div></div>
+      <div class="opt" onclick="sel(this,'d2_1',65)"><div class="opt-letter">B</div><div class="opt-text">Mostly tracked — we manage most auths but some fall through the cracks</div></div>
+      <div class="opt" onclick="sel(this,'d2_1',35)"><div class="opt-letter">C</div><div class="opt-text">Informally — staff manage auths individually without a centralized system</div></div>
+      <div class="opt" onclick="sel(this,'d2_1',15)"><div class="opt-letter">D</div><div class="opt-text">Prior auth delays and denials are a significant ongoing problem at our clinic</div></div>
+    </div>
+  </div>
+
+  <div class="question-card">
+    <p class="q-num">Question 2-2</p>
+    <p class="q-text">What is your clinic's referral completion rate — the percentage of specialist referrals that result in a completed specialist visit?</p>
+    <div class="options" data-q="d2_2">
+      <div class="opt" onclick="sel(this,'d2_2',100)"><div class="opt-letter">A</div><div class="opt-text">Above 80% — most referrals complete successfully</div></div>
+      <div class="opt" onclick="sel(this,'d2_2',70)"><div class="opt-letter">B</div><div class="opt-text">60–80% — near the NACHC national benchmark range</div></div>
+      <div class="opt" onclick="sel(this,'d2_2',40)"><div class="opt-letter">C</div><div class="opt-text">40–60% — a significant portion of referrals are lost</div></div>
+      <div class="opt" onclick="sel(this,'d2_2',15)"><div class="opt-letter">D</div><div class="opt-text">Below 40% or we don't track referral completion rates</div></div>
+    </div>
+  </div>
+
+  <div class="question-card">
+    <p class="q-num">Question 2-3</p>
+    <p class="q-text">How does your clinic communicate prior authorization delays or denials to patients?</p>
+    <div class="options" data-q="d2_3">
+      <div class="opt" onclick="sel(this,'d2_3',100)"><div class="opt-letter">A</div><div class="opt-text">Proactively — patients are notified promptly and given clear next steps when there are delays</div></div>
+      <div class="opt" onclick="sel(this,'d2_3',65)"><div class="opt-letter">B</div><div class="opt-text">When resolved — we notify patients after the auth is approved but often with delays</div></div>
+      <div class="opt" onclick="sel(this,'d2_3',35)"><div class="opt-letter">C</div><div class="opt-text">Inconsistently — patient communication about auth status is a known gap</div></div>
+      <div class="opt" onclick="sel(this,'d2_3',15)"><div class="opt-letter">D</div><div class="opt-text">Poorly — patients frequently don't know the status of their authorizations</div></div>
+    </div>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn btn-secondary" onclick="goTo(1)">← Back</button>
+    <button class="btn btn-primary" onclick="goTo(3)">Domain 3 →</button>
+  </div>
+</div>
+
+<!-- SCREEN 3: DOMAIN 3 — NO-SHOW PREVENTION -->
+<div class="screen" id="screen-3">
+  <div class="domain-header">
+    <p class="domain-eyebrow">Domain 3 of 5</p>
+    <h2 class="domain-title">No-Show Prevention</h2>
+    <p class="domain-source">Federal standards: HRSA UDS 2024 no-show benchmarks · SAMHSA FQHC no-show literature · AAFP Scheduling Best Practices · NACHC care coordination research · National benchmark: 18–22% FQHC no-show rate</p>
+  </div>
+
+  <div class="question-card">
+    <p class="q-num">Question 3-1</p>
+    <p class="q-text">What is your clinic's current overall no-show rate?</p>
+    <div class="options" data-q="d3_1">
+      <div class="opt" onclick="sel(this,'d3_1',100)"><div class="opt-letter">A</div><div class="opt-text">Below 15% — below national FQHC average</div></div>
+      <div class="opt" onclick="sel(this,'d3_1',75)"><div class="opt-letter">B</div><div class="opt-text">15–22% — near national average</div></div>
+      <div class="opt" onclick="sel(this,'d3_1',45)"><div class="opt-letter">C</div><div class="opt-text">23–30% — above national average</div></div>
+      <div class="opt" onclick="sel(this,'d3_1',20)"><div class="opt-letter">D</div><div class="opt-text">Above 30% — significantly above national average</div></div>
+      <div class="opt" onclick="sel(this,'d3_1',30)"><div class="opt-letter">E</div><div class="opt-text">We don't track our no-show rate consistently</div></div>
+    </div>
+  </div>
+
+  <div class="question-card">
+    <p class="q-num">Question 3-2</p>
+    <p class="q-text">Does your clinic have a structured pre-visit outreach and reminder protocol?</p>
+    <div class="options" data-q="d3_2">
+      <div class="opt" onclick="sel(this,'d3_2',100)"><div class="opt-letter">A</div><div class="opt-text">Yes — automated reminder + live confirmation call + 72-hour pre-visit contact for high-risk patients</div></div>
+      <div class="opt" onclick="sel(this,'d3_2',65)"><div class="opt-letter">B</div><div class="opt-text">Partial — automated reminder only, no live confirmation call</div></div>
+      <div class="opt" onclick="sel(this,'d3_2',35)"><div class="opt-letter">C</div><div class="opt-text">Minimal — reminders sent but inconsistently, no structured protocol</div></div>
+      <div class="opt" onclick="sel(this,'d3_2',10)"><div class="opt-letter">D</div><div class="opt-text">Limited — little to no structured reminder or outreach process</div></div>
+    </div>
+  </div>
+
+  <div class="question-card">
+    <p class="q-num">Question 3-3</p>
+    <p class="q-text">When a patient no-shows, does your clinic have a structured recovery protocol?</p>
+    <div class="options" data-q="d3_3">
+      <div class="opt" onclick="sel(this,'d3_3',100)"><div class="opt-letter">A</div><div class="opt-text">Yes — 72-hour recovery call, slot released for same-day booking, rescheduling rate tracked</div></div>
+      <div class="opt" onclick="sel(this,'d3_3',60)"><div class="opt-letter">B</div><div class="opt-text">Informal — staff try to reschedule but without a formal protocol</div></div>
+      <div class="opt" onclick="sel(this,'d3_3',30)"><div class="opt-letter">C</div><div class="opt-text">Minimal — no-shows are recorded but follow-up is inconsistent</div></div>
+      <div class="opt" onclick="sel(this,'d3_3',10)"><div class="opt-letter">D</div><div class="opt-text">None — no-shows are recorded but there is no recovery protocol</div></div>
+    </div>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn btn-secondary" onclick="goTo(2)">← Back</button>
+    <button class="btn btn-primary" onclick="goTo(4)">Domain 4 →</button>
+  </div>
+</div>
+
+<!-- SCREEN 4: DOMAIN 4 — PATIENT COMMUNICATION -->
+<div class="screen" id="screen-4">
+  <div class="domain-header">
+    <p class="domain-eyebrow">Domain 4 of 5</p>
+    <h2 class="domain-title">Patient Communication & Health Literacy</h2>
+    <p class="domain-source">Federal standards: AHRQ Health Literacy Universal Precautions Toolkit (3rd Ed.) · Plain Writing Act of 2010 · HHS National CLAS Standards · NLM MedlinePlus · HRSA health literacy standards</p>
+  </div>
+
+  <div class="question-card">
+    <p class="q-num">Question 4-1</p>
+    <p class="q-text">How does your clinic communicate health information to patients with limited health literacy or limited English proficiency (LEP)?</p>
+    <div class="options" data-q="d4_1">
+      <div class="opt" onclick="sel(this,'d4_1',100)"><div class="opt-letter">A</div><div class="opt-text">We use plain-language materials, professional interpretation services, and assess literacy risk for each patient</div></div>
+      <div class="opt" onclick="sel(this,'d4_1',65)"><div class="opt-letter">B</div><div class="opt-text">We have bilingual materials and use interpretation when requested but don't screen proactively</div></div>
+      <div class="opt" onclick="sel(this,'d4_1',35)"><div class="opt-letter">C</div><div class="opt-text">We rely on bilingual staff or family members for interpretation — no professional service</div></div>
+      <div class="opt" onclick="sel(this,'d4_1',15)"><div class="opt-letter">D</div><div class="opt-text">Health literacy and language access are known gaps at our clinic</div></div>
+    </div>
+  </div>
+
+  <div class="question-card">
+    <p class="q-num">Question 4-2</p>
+    <p class="q-text">How does your clinic use patient teach-back or comprehension confirmation after clinical visits?</p>
+    <div class="options" data-q="d4_2">
+      <div class="opt" onclick="sel(this,'d4_2',100)"><div class="opt-letter">A</div><div class="opt-text">Consistently — teach-back is standard practice and documented in the patient record</div></div>
+      <div class="opt" onclick="sel(this,'d4_2',65)"><div class="opt-letter">B</div><div class="opt-text">Often — most providers use teach-back but practice varies</div></div>
+      <div class="opt" onclick="sel(this,'d4_2',35)"><div class="opt-letter">C</div><div class="opt-text">Rarely — teach-back is not a standard part of our clinical workflow</div></div>
+      <div class="opt" onclick="sel(this,'d4_2',15)"><div class="opt-letter">D</div><div class="opt-text">Not used — we have not implemented teach-back protocols</div></div>
+    </div>
+  </div>
+
+  <div class="question-card">
+    <p class="q-num">Question 4-3</p>
+    <p class="q-text">How effectively does your clinic communicate care plan information after visits — including follow-up instructions, medication changes, and referral next steps?</p>
+    <div class="options" data-q="d4_3">
+      <div class="opt" onclick="sel(this,'d4_3',100)"><div class="opt-letter">A</div><div class="opt-text">Very effectively — written after-visit summary in plain language provided to every patient</div></div>
+      <div class="opt" onclick="sel(this,'d4_3',65)"><div class="opt-letter">B</div><div class="opt-text">Adequately — most patients receive instructions but format and clarity varies</div></div>
+      <div class="opt" onclick="sel(this,'d4_3',35)"><div class="opt-letter">C</div><div class="opt-text">Inconsistently — after-visit communication depends heavily on the individual provider</div></div>
+      <div class="opt" onclick="sel(this,'d4_3',15)"><div class="opt-letter">D</div><div class="opt-text">Poorly — after-visit communication is a documented gap affecting follow-through</div></div>
+    </div>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn btn-secondary" onclick="goTo(3)">← Back</button>
+    <button class="btn btn-primary" onclick="goTo(5)">Domain 5 →</button>
+  </div>
+</div>
+
+<!-- SCREEN 5: DOMAIN 5 — FRONT-DOOR RCM -->
+<div class="screen" id="screen-5">
+  <div class="domain-header">
+    <p class="domain-eyebrow">Domain 5 of 5</p>
+    <h2 class="domain-title">Front-Door Revenue Cycle Alignment</h2>
+    <p class="domain-source">Federal standards: No Surprises Act (Pub. L. 116-260) · CMS Good Faith Estimate Requirements · HRSA Sliding Fee Discount Program (42 CFR Part 51c) · HFMA revenue cycle benchmarks</p>
+  </div>
+
+  <div class="question-card">
+    <p class="q-num">Question 5-1</p>
+    <p class="q-text">How would you characterize front-door revenue leakage at your clinic — eligibility errors, unbilled services, sliding fee gaps?</p>
+    <div class="options" data-q="d5_1">
+      <div class="opt" onclick="sel(this,'d5_1',100)"><div class="opt-letter">A</div><div class="opt-text">Minimal — we have strong eligibility verification and billing accuracy at the front door</div></div>
+      <div class="opt" onclick="sel(this,'d5_1',65)"><div class="opt-letter">B</div><div class="opt-text">Some — we know there is revenue leakage but the volume is manageable</div></div>
+      <div class="opt" onclick="sel(this,'d5_1',35)"><div class="opt-letter">C</div><div class="opt-text">Significant — front-door revenue leakage is a known operational problem</div></div>
+      <div class="opt" onclick="sel(this,'d5_1',15)"><div class="opt-letter">D</div><div class="opt-text">We don't have good visibility into front-door revenue leakage</div></div>
+    </div>
+  </div>
+
+  <div class="question-card">
+    <p class="q-num">Question 5-2</p>
+    <p class="q-text">How does your clinic handle same-day scheduling and walk-in patient access?</p>
+    <div class="options" data-q="d5_2">
+      <div class="opt" onclick="sel(this,'d5_2',100)"><div class="opt-letter">A</div><div class="opt-text">We reserve a structured percentage of daily slots for same-day access and walk-ins</div></div>
+      <div class="opt" onclick="sel(this,'d5_2',65)"><div class="opt-letter">B</div><div class="opt-text">We accommodate same-day patients when capacity allows but without a formal reserve</div></div>
+      <div class="opt" onclick="sel(this,'d5_2',35)"><div class="opt-letter">C</div><div class="opt-text">Same-day access is difficult — our schedule fills quickly and access barriers are a known issue</div></div>
+      <div class="opt" onclick="sel(this,'d5_2',15)"><div class="opt-letter">D</div><div class="opt-text">Same-day access is not available — patients requiring urgent care are directed elsewhere</div></div>
+    </div>
+  </div>
+
+  <div class="question-card">
+    <p class="q-num">Question 5-3</p>
+    <p class="q-text">How does your clinic track and report access performance metrics (no-show rate, days to third next available, referral completion rate) to leadership?</p>
+    <div class="options" data-q="d5_3">
+      <div class="opt" onclick="sel(this,'d5_3',100)"><div class="opt-letter">A</div><div class="opt-text">Monthly — key access metrics are tracked, reported to leadership, and benchmarked against HRSA UDS</div></div>
+      <div class="opt" onclick="sel(this,'d5_3',65)"><div class="opt-letter">B</div><div class="opt-text">Quarterly — access metrics are reviewed but not benchmarked against national standards</div></div>
+      <div class="opt" onclick="sel(this,'d5_3',35)"><div class="opt-letter">C</div><div class="opt-text">Annually — access performance is reviewed at HRSA reporting time only</div></div>
+      <div class="opt" onclick="sel(this,'d5_3',15)"><div class="opt-letter">D</div><div class="opt-text">Access performance metrics are not consistently tracked or reported</div></div>
+    </div>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn btn-secondary" onclick="goTo(4)">← Back</button>
+    <button class="btn btn-primary" onclick="goTo(6)">Organizational Readiness →</button>
+  </div>
+</div>
+
+<!-- SCREEN 6: DOMAIN 6 — READINESS -->
+<div class="screen" id="screen-6">
+  <div class="domain-header" style="border-left-color:var(--gold);">
+    <p class="domain-eyebrow" style="color:var(--gold);">Domain 6 — Organizational Readiness</p>
+    <h2 class="domain-title">Is your organization ready to improve?</h2>
+    <p class="domain-source">These questions help ConnectingCare Group understand how to best support your improvement journey. There are no wrong answers.</p>
+  </div>
+
+  <div class="question-card">
+    <p class="q-num">Question R-1</p>
+    <p class="q-text">How would you describe your leadership team's current appetite for operational change?</p>
+    <div class="options" data-q="r1">
+      <div class="opt" onclick="sel(this,'r1',100)"><div class="opt-letter">A</div><div class="opt-text">Actively seeking change — leadership is aligned and ready to move</div></div>
+      <div class="opt" onclick="sel(this,'r1',75)"><div class="opt-letter">B</div><div class="opt-text">Open to change — leadership is supportive but cautious</div></div>
+      <div class="opt" onclick="sel(this,'r1',50)"><div class="opt-letter">C</div><div class="opt-text">Mixed — some leaders are ready, others are resistant</div></div>
+      <div class="opt" onclick="sel(this,'r1',25)"><div class="opt-letter">D</div><div class="opt-text">Change is difficult here — significant internal barriers exist</div></div>
+      <div class="opt" onclick="sel(this,'r1',40)"><div class="opt-letter">E</div><div class="opt-text">Not sure — hard to gauge leadership sentiment right now</div></div>
+    </div>
+  </div>
+
+  <div class="question-card">
+    <p class="q-num">Question R-2</p>
+    <p class="q-text">Does your team currently have the bandwidth to implement new workflows or processes?</p>
+    <div class="options" data-q="r2">
+      <div class="opt" onclick="sel(this,'r2',100)"><div class="opt-letter">A</div><div class="opt-text">Yes — we have dedicated capacity for improvement initiatives</div></div>
+      <div class="opt" onclick="sel(this,'r2',75)"><div class="opt-letter">B</div><div class="opt-text">Somewhat — we can make time if the process is streamlined</div></div>
+      <div class="opt" onclick="sel(this,'r2',40)"><div class="opt-letter">C</div><div class="opt-text">Limited — our team is stretched and bandwidth is a real concern</div></div>
+      <div class="opt" onclick="sel(this,'r2',20)"><div class="opt-letter">D</div><div class="opt-text">No — we are in survival mode right now</div></div>
+    </div>
+  </div>
+
+  <div class="question-card">
+    <p class="q-num">Question R-3</p>
+    <p class="q-text">How does your organization currently use data to make operational decisions?</p>
+    <div class="options" data-q="r3">
+      <div class="opt" onclick="sel(this,'r3',100)"><div class="opt-letter">A</div><div class="opt-text">Actively — data drives our decisions regularly</div></div>
+      <div class="opt" onclick="sel(this,'r3',70)"><div class="opt-letter">B</div><div class="opt-text">Sometimes — we use data when it's easily available</div></div>
+      <div class="opt" onclick="sel(this,'r3',30)"><div class="opt-letter">C</div><div class="opt-text">Rarely — we rely more on experience and intuition</div></div>
+      <div class="opt" onclick="sel(this,'r3',60)"><div class="opt-letter">D</div><div class="opt-text">We want to use data more but don't have the right tools or access yet</div></div>
+    </div>
+  </div>
+
+  <div class="question-card">
+    <p class="q-num">Question R-4 — What's driving your interest? <span style="font-size:11px;color:var(--teal);font-weight:600;">(Select all that apply)</span></p>
+    <p class="q-text">What is driving your organization's interest in access improvement right now?</p>
+    <div class="checkbox-group" id="r4_group">
+      <div class="checkbox-item"><input type="checkbox" id="r4a" value="patient_outcomes"><label for="r4a">Patient outcomes — we want better results for our community</label></div>
+      <div class="checkbox-item"><input type="checkbox" id="r4b" value="revenue"><label for="r4b">Revenue — we are experiencing financial pressure</label></div>
+      <div class="checkbox-item"><input type="checkbox" id="r4c" value="funder"><label for="r4c">Funder or grant requirements — we need to demonstrate outcomes</label></div>
+      <div class="checkbox-item"><input type="checkbox" id="r4d" value="mandate"><label for="r4d">Leadership mandate — we've been directed to improve access</label></div>
+      <div class="checkbox-item"><input type="checkbox" id="r4e" value="competitive"><label for="r4e">Competitive pressure — other organizations are pulling ahead</label></div>
+      <div class="checkbox-item"><input type="checkbox" id="r4f" value="tried_ourselves"><label for="r4f">We've tried to fix this ourselves and need outside support</label></div>
+    </div>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn btn-secondary" onclick="goTo(5)">← Back</button>
+    <button class="btn btn-gold" onclick="calculateResults()">See My Results →</button>
+  </div>
+</div>
+
+<!-- RESULTS -->
+<div class="screen" id="screen-7">
+  <div class="results-hero">
+    <p class="eyebrow">ConnectingCare Group · Primary & Community Care Access Index</p>
+    <h2 style="font-size:26px;color:white;margin-bottom:6px;" id="resultsTitle">Your Access Index Results</h2>
+    <p style="color:rgba(255,255,255,0.65);font-size:14px;" id="resultsMeta"></p>
+    <div class="score-wrap">
+      <div class="score-circle" id="scoreCircle">
+        <span class="score-num" id="overallScore">--</span>
+        <span class="score-sub-label">/ 100</span>
+      </div>
+      <div>
+        <div class="band-label" id="bandLabel"></div>
+        <div class="band-desc" id="bandDesc"></div>
+      </div>
+    </div>
+  </div>
+
+  <h3 style="font-family:'Lora',serif;color:var(--navy);margin-bottom:16px;">Domain Scores</h3>
+  <div class="domain-results" id="domainResults"></div>
+
+  <div class="action-brief">
+    <h3 style="font-family:'Lora',serif;color:var(--navy);margin-bottom:16px;">Your Top 3 Priority Actions</h3>
+    <div id="actionItems"></div>
+  </div>
+
+  <div id="readinessResult"></div>
+
+  <div class="cta-section">
+    <h3>What's next for your organization?</h3>
+    <p>Your Access Index score is the starting point. ConnectingCare Group can turn these results into a prioritized improvement roadmap — with tools that stay embedded and track outcomes over time.</p>
+    <div class="three-cards">
+      <div class="cta-card">
+        <div class="cta-card-title">📋 Get Your Full Report</div>
+        <div class="cta-card-body">Create a free portal account to receive 1–2 evidence-based recommendations benchmarked against HRSA and NACHC standards — delivered within 5 business days.</div>
+        <a href="https://connectingcaregroup.com/login" class="btn btn-primary" style="text-decoration:none;font-size:13px;padding:10px 18px;" target="_blank">Sign Up Free →</a>
+      </div>
+      <div class="cta-card">
+        <div class="cta-card-title">📉 Also Try the No-Show Tool</div>
+        <div class="cta-card-body">Identify the specific root causes driving your no-show rate and get intervention protocols matched to your patient population.</div>
+        <a href="https://connectingcaregroup.com/tools/no-show" class="btn btn-primary" style="text-decoration:none;font-size:13px;padding:10px 18px;" target="_blank">Open Tool →</a>
+      </div>
+      <div class="cta-card">
+        <div class="cta-card-title">💬 Talk to ConnectingCare Group</div>
+        <div class="cta-card-body">Ready to discuss what a CCG partnership looks like for your clinic? We respond within one business day.</div>
+        <a href="https://connectingcaregroup.com/contact" class="btn btn-primary" style="text-decoration:none;font-size:13px;padding:10px 18px;" target="_blank">Request a Conversation →</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="disclaimer">
+    <strong>ConnectingCare Group · Primary & Community Care Access Index</strong><br>
+    Benchmarks sourced from: HRSA Uniform Data System (UDS) 2024 · SAMHSA FQHC no-show literature · NACHC care coordination research · AAFP scheduling best practices · CMS Managed Care standards · AHRQ Health Literacy Universal Precautions Toolkit · No Surprises Act (Pub. L. 116-260) · HRSA Sliding Fee Discount Program (42 CFR Part 51c).<br><br>
+    This assessment is for operational planning purposes only. It does not constitute clinical, medical, legal, or regulatory advice. ConnectingCare Group (CCG) is a health access intelligence organization — not a clinical provider, insurer, or legal advisor. connectingcaregroup.com · partners@connectingcaregroup.com
+  </div>
+
+  <div class="btn-row" style="justify-content:center;margin-top:24px;">
+    <button class="btn btn-secondary" onclick="window.print()">🖨 Print Results</button>
+    <button class="btn btn-primary" onclick="location.reload()">Start New Assessment</button>
+  </div>
+</div>
+
+</div>
+
+<script>
+let cs=0;
+const ans={};
+const TOTAL=8;
+
+function goTo(n){
+  document.getElementById('screen-'+cs).classList.remove('active');
+  document.getElementById('screen-'+n).classList.add('active');
+  cs=n; updateProgress(); window.scrollTo(0,0);
+}
+function updateProgress(){
+  const pct=(cs/(TOTAL-1))*100;
+  document.getElementById('progressBar').style.width=pct+'%';
+  document.getElementById('progressText').textContent='Step '+(cs+1)+' of '+TOTAL;
+  document.querySelectorAll('.step-dot').forEach((d,i)=>{
+    d.classList.remove('active','done');
+    if(i===cs) d.classList.add('active');
+    else if(i<cs) d.classList.add('done');
+  });
+}
+function sel(el,key,val){
+  el.closest('.options').querySelectorAll('.opt').forEach(o=>o.classList.remove('selected'));
+  el.classList.add('selected');
+  ans[key]=val;
+}
+function avg(keys){
+  const scored=keys.filter(k=>ans[k]!==undefined);
+  if(!scored.length) return null;
+  return Math.round(scored.reduce((s,k)=>s+ans[k],0)/scored.length);
+}
+function fmt(n){return '$'+Math.round(n).toLocaleString();}
+
+function calculateResults(){
+  // Get r4 checkboxes
+  const r4checks=['r4a','r4b','r4c','r4d','r4e','r4f'].filter(id=>document.getElementById(id).checked);
+  const r4score=Math.min(100,r4checks.length*15);
+  ans['r4']=r4score;
+
+  const domains=[
+    {key:'d1',label:'Eligibility Verification',questions:['d1_1','d1_2','d1_3'],color:'#0D7B8A'},
+    {key:'d2',label:'Prior Authorization Workflow',questions:['d2_1','d2_2','d2_3'],color:'#1A7A4A'},
+    {key:'d3',label:'No-Show Prevention',questions:['d3_1','d3_2','d3_3'],color:'#C9963A'},
+    {key:'d4',label:'Patient Communication & Health Literacy',questions:['d4_1','d4_2','d4_3'],color:'#1B2A4A'},
+    {key:'d5',label:'Front-Door Revenue Cycle Alignment',questions:['d5_1','d5_2','d5_3'],color:'#C0392B'},
+  ];
+  const readinessQ=['r1','r2','r3','r4'];
+
+  // Calculate domain scores
+  const dScores=domains.map(d=>({...d,score:avg(d.questions)||50}));
+  const opAvg=Math.round(dScores.reduce((s,d)=>s+d.score,0)/dScores.length);
+  const rScored=readinessQ.filter(k=>ans[k]!==undefined);
+  const readinessScore=rScored.length?Math.round(rScored.reduce((s,k)=>s+ans[k],0)/rScored.length):50;
+  const overall=Math.round(opAvg*0.85+readinessScore*0.15);
+
+  // Band
+  let band,bandColor,bandDesc;
+  if(overall>=80){band='High Performance';bandColor='#1A7A4A';bandDesc='Your clinic demonstrates strong access infrastructure across all five domains. A ConnectingCare Group partnership can focus on optimization, reporting, and benchmarking to sustain and improve performance.';}
+  else if(overall>=60){band='Moderate Performance';bandColor='#C9963A';bandDesc='Meaningful gaps exist in 2–3 domains. A ConnectingCare Group partnership will target your highest-priority domains first with a structured 90-day improvement roadmap.';}
+  else if(overall>=40){band='Significant Gaps';bandColor='#E67E22';bandDesc='Access failures are affecting multiple domains. A full ConnectingCare Group partnership with a phased roadmap is recommended. The good news: every gap identified here is addressable.';}
+  else{band='Critical Access Failures';bandColor='#C0392B';bandDesc='Immediate intervention is needed. ConnectingCare Group can prioritize the highest-impact domains first to generate measurable improvement within 60–90 days.';}
+
+  // Readiness band
+  let rBand,rColor,rBg,rMsg;
+  if(readinessScore>=80){rBand='Partnership Ready';rColor='#1A7A4A';rBg='#E8F5EE';rMsg='Your organization has the leadership alignment, staff capacity, and motivation to act on access intelligence recommendations. ConnectingCare Group recommends a full partnership engagement.';}
+  else if(readinessScore>=60){rBand='Building Momentum';rColor='#C9963A';rBg='#FEF6E8';rMsg='Your organization wants to change but faces some internal barriers. CCG recommends a phased 90-day starter engagement with clear milestones.';}
+  else if(readinessScore>=40){rBand='Laying the Foundation';rColor='#E67E22';rBg='#FEF0D8';rMsg='Your organization is aware of the need but building readiness. CCG can provide intelligence tools and light-touch support while internal capacity develops.';}
+  else{rBand='Not Yet Ready';rColor='#C0392B';rBg='#FDECEA';rMsg='Significant organizational barriers exist. CCG will provide resources and a 60-day check-in to reassess when circumstances change.';}
+
+  // Action map
+  const actionMap={
+    d1:'<strong>Eligibility Verification Gap:</strong> Implement pre-visit eligibility check + cost estimate protocol. Enroll eligible patients in sliding fee program proactively. Target: reduce eligibility errors by 60% within 90 days. Source: HRSA 42 CFR Part 51c.',
+    d2:'<strong>Prior Authorization Workflow Gap:</strong> Build a centralized authorization tracking system. Assign one staff member to own auth follow-up. Target: improve referral completion rate to 70%+ within 90 days. Source: NACHC care coordination benchmarks.',
+    d3:'<strong>No-Show Prevention Gap:</strong> Implement 72-hour pre-visit outreach + recovery call protocol. Reserve 15–20% of daily slots for same-day access. Target: reduce no-show rate by 5–8 percentage points within 90 days. Source: SAMHSA FQHC research.',
+    d4:'<strong>Patient Communication Gap:</strong> Adopt plain-language after-visit summaries. Implement teach-back protocols. Contract with professional interpretation service. Source: AHRQ Health Literacy Universal Precautions Toolkit.',
+    d5:'<strong>Front-Door Revenue Cycle Gap:</strong> Track and report access metrics monthly. Implement same-day scheduling reserve. Conduct front-door revenue leakage audit. Source: HFMA revenue cycle benchmarks, No Surprises Act.',
+  };
+
+  // RENDER
+  const orgName=document.getElementById('orgName').value||'Your Organization';
+  document.getElementById('resultsTitle').textContent='Access Index Results — '+orgName;
+  document.getElementById('resultsMeta').textContent='Primary & Community Care · Overall Score: '+overall+'/100';
+  const sc=document.getElementById('scoreCircle');
+  sc.style.borderColor=bandColor;
+  document.getElementById('overallScore').textContent=overall;
+  document.getElementById('overallScore').style.color=bandColor;
+  document.getElementById('bandLabel').textContent=band;
+  document.getElementById('bandLabel').style.color=bandColor;
+  document.getElementById('bandDesc').textContent=bandDesc;
+
+  // Domain results
+  const dr=document.getElementById('domainResults');
+  dr.innerHTML='';
+  dScores.forEach(d=>{
+    const s=d.score;
+    const status=s>=80?'Strong':s>=60?'Moderate':s>=40?'Needs Attention':'Critical Gap';
+    const sBg=s>=80?'#E8F5EE':s>=60?'#FEF6E8':s>=40?'#FEF0D8':'#FDECEA';
+    const sColor=s>=80?'#1A7A4A':s>=60?'#C9963A':s>=40?'#E67E22':'#C0392B';
+    dr.innerHTML+=`<div class="domain-result-card" style="border-top-color:${d.color}">
+      <p class="dr-label">Domain</p>
+      <p class="dr-title">${d.label}</p>
+      <div class="dr-score-row">
+        <span class="dr-score" style="color:${d.color}">${s}</span>
+        <div class="dr-bar-wrap"><div class="dr-bar" style="width:${s}%;background:${d.color}"></div></div>
+      </div>
+      <span class="dr-status" style="background:${sBg};color:${sColor}">${status}</span>
+    </div>`;
+  });
+
+  // Actions — bottom 3 domains
+  const sorted=[...dScores].sort((a,b)=>a.score-b.score);
+  const ai=document.getElementById('actionItems');
+  ai.innerHTML='';
+  sorted.slice(0,3).forEach((d,i)=>{
+    ai.innerHTML+=`<div class="action-item">
+      <div class="action-num">${i+1}</div>
+      <div class="action-text">${actionMap[d.key]||'Contact ConnectingCare Group for domain-specific recommendations.'}</div>
+    </div>`;
+  });
+
+  // Readiness
+  document.getElementById('readinessResult').innerHTML=`
+    <div class="readiness-box" style="background:${rBg};border-left:5px solid ${rColor};margin-bottom:24px;">
+      <h3 style="color:${rColor};font-family:'Lora',serif;margin-bottom:8px;">Organizational Readiness: ${readinessScore}/100 — ${rBand}</h3>
+      <p style="font-size:14px;color:var(--gray);line-height:1.6;">${rMsg}</p>
+      <p style="font-size:12px;color:var(--gray);margin-top:8px;opacity:0.8;">Your full readiness profile — including detailed recommendations matched to your readiness band — is included in the full report available through the ConnectingCare Group portal.</p>
+    </div>`;
+
+  goTo(7);
+}
+updateProgress();
+</script>
+</body>
+</html>

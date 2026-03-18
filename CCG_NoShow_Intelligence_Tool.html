@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>No-Show Intelligence Tool — ConnectingCare Group</title>
+<link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;600;700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#1B2A4A;--teal:#0D7B8A;--gold:#C9963A;--green:#1A7A4A;
+  --red:#C0392B;--gray:#4A5568;--lgray:#F1F4F8;--white:#ffffff;
+  --lgold:#FEF6E8;--lgreen:#E8F5EE;--lred:#FDECEA;--lblue:#EAF3FB;
+  --orange:#E67E22;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',sans-serif;background:var(--lgray);color:var(--gray);line-height:1.6;}
+h1,h2,h3,h4{font-family:'Lora',serif;}
+.header{background:var(--navy);}
+.header-inner{max-width:900px;margin:0 auto;padding:36px 24px;}
+.eyebrow{font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--teal);margin-bottom:10px;}
+.header h1{font-size:clamp(24px,4vw,40px);color:white;font-weight:700;line-height:1.2;margin-bottom:10px;}
+.header-sub{color:rgba(255,255,255,0.72);font-size:15px;max-width:620px;line-height:1.7;}
+.badges{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px;}
+.badge{background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.8);padding:4px 12px;border-radius:20px;font-size:11px;font-weight:600;}
+.progress-wrap{background:rgba(255,255,255,0.1);height:4px;}
+.progress-bar{background:var(--teal);height:4px;transition:width 0.4s ease;width:0%;}
+.progress-meta{max-width:900px;margin:0 auto;padding:8px 24px;display:flex;justify-content:space-between;align-items:center;}
+.progress-text{font-size:12px;color:rgba(255,255,255,0.6);}
+.step-dots{display:flex;gap:6px;}
+.step-dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,0.2);transition:all 0.3s;}
+.step-dot.active{background:var(--teal);}
+.step-dot.done{background:var(--green);}
+.main{max-width:900px;margin:0 auto;padding:32px 24px 80px;}
+.screen{display:none;}
+.screen.active{display:block;}
+.screen-title{font-size:26px;font-weight:700;color:var(--navy);margin-bottom:6px;}
+.screen-sub{font-size:15px;color:var(--gray);margin-bottom:28px;max-width:640px;}
+.form-section{background:white;border-radius:14px;padding:28px;margin-bottom:20px;border:1px solid #e8e8e8;}
+.fs-title{font-size:16px;font-weight:700;color:var(--navy);margin-bottom:4px;}
+.fs-sub{font-size:13px;color:var(--gray);margin-bottom:20px;}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.form-grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;}
+@media(max-width:600px){.form-grid,.form-grid-3{grid-template-columns:1fr;}}
+.form-group{display:flex;flex-direction:column;gap:6px;}
+.form-group.full{grid-column:1/-1;}
+label{font-size:13px;font-weight:600;color:var(--navy);}
+.hint{font-weight:400;color:var(--gray);font-size:12px;}
+input[type=number],input[type=text],input[type=email],select{
+  padding:10px 14px;border:1.5px solid #d0d0d0;border-radius:8px;
+  font-family:'DM Sans',sans-serif;font-size:14px;color:var(--gray);
+  transition:border-color 0.2s;width:100%;
+}
+input:focus,select:focus{outline:none;border-color:var(--teal);}
+.suffix-wrap{position:relative;}
+.suffix-wrap input{padding-right:48px;}
+.suffix{position:absolute;right:12px;top:50%;transform:translateY(-50%);font-size:12px;color:var(--gray);font-weight:600;pointer-events:none;}
+.question-card{background:white;border-radius:12px;padding:24px;margin-bottom:16px;border:1px solid #e8e8e8;}
+.q-num{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--teal);margin-bottom:8px;}
+.q-text{font-size:15px;font-weight:600;color:var(--navy);margin-bottom:16px;line-height:1.5;}
+.options{display:flex;flex-direction:column;gap:10px;}
+.opt{display:flex;align-items:flex-start;gap:12px;padding:12px 16px;border:1.5px solid #e0e0e0;border-radius:10px;cursor:pointer;transition:all 0.2s;}
+.opt:hover{border-color:var(--teal);background:var(--lblue);}
+.opt.selected{border-color:var(--teal);background:var(--lblue);}
+.opt-letter{width:28px;height:28px;border-radius:50%;background:var(--lgray);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--navy);flex-shrink:0;transition:all 0.2s;}
+.opt.selected .opt-letter{background:var(--teal);color:white;}
+.opt-text{font-size:14px;color:var(--gray);line-height:1.5;padding-top:3px;}
+.callout{border-radius:10px;padding:14px 18px;margin:14px 0;font-size:14px;line-height:1.6;}
+.callout-teal{background:var(--lblue);border-left:4px solid var(--teal);color:var(--navy);}
+.callout-gold{background:var(--lgold);border-left:4px solid var(--gold);color:var(--navy);}
+.callout-red{background:var(--lred);border-left:4px solid var(--red);color:var(--navy);}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:12px 28px;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;border:none;transition:all 0.2s;text-decoration:none;}
+.btn-primary{background:var(--teal);color:white;}
+.btn-primary:hover{background:#0a6575;}
+.btn-secondary{background:white;color:var(--navy);border:2px solid var(--navy);}
+.btn-secondary:hover{background:var(--navy);color:white;}
+.btn-gold{background:var(--gold);color:white;}
+.btn-gold:hover{background:#a87d2e;}
+.btn-row{display:flex;gap:12px;margin-top:28px;flex-wrap:wrap;}
+.section-divider{height:2px;background:linear-gradient(90deg,var(--teal),transparent);margin:24px 0;border-radius:1px;}
+/* RESULTS */
+.results-hero{background:var(--navy);border-radius:14px;padding:32px;color:white;margin-bottom:24px;}
+.results-title{font-size:26px;color:white;margin-bottom:6px;}
+.results-org{color:rgba(255,255,255,0.65);font-size:14px;}
+.score-wrap{display:flex;align-items:center;gap:20px;flex-wrap:wrap;margin:20px 0;}
+.score-circle{width:100px;height:100px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;border:4px solid;flex-shrink:0;}
+.score-num{font-family:'Lora',serif;font-size:32px;font-weight:700;line-height:1;}
+.score-sub{font-size:10px;letter-spacing:1px;text-transform:uppercase;margin-top:2px;}
+.score-band-label{font-size:20px;font-weight:700;margin-bottom:6px;}
+.score-band-desc{font-size:14px;opacity:0.8;line-height:1.6;}
+.metrics-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:24px;}
+.metric-card{background:white;border-radius:12px;padding:20px;border-top:4px solid;}
+.metric-label{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--gray);margin-bottom:6px;}
+.metric-value{font-size:28px;font-weight:700;font-family:'Lora',serif;}
+.metric-sub{font-size:12px;color:var(--gray);margin-top:4px;line-height:1.5;}
+.metric-flag{font-size:11px;font-weight:700;padding:2px 10px;border-radius:10px;display:inline-block;margin-top:6px;}
+.domain-results{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;margin-bottom:24px;}
+.domain-card{background:white;border-radius:12px;padding:20px;border-top:4px solid;}
+.dc-label{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gray);margin-bottom:6px;}
+.dc-title{font-size:14px;font-weight:600;color:var(--navy);margin-bottom:12px;}
+.dc-score-row{display:flex;align-items:center;gap:12px;margin-bottom:8px;}
+.dc-score{font-size:28px;font-weight:700;font-family:'Lora',serif;}
+.dc-bar-wrap{flex:1;height:8px;background:var(--lgray);border-radius:4px;overflow:hidden;}
+.dc-bar{height:8px;border-radius:4px;transition:width 1s ease;}
+.dc-status{font-size:11px;font-weight:700;padding:2px 10px;border-radius:10px;display:inline-block;}
+.revenue-box{background:var(--navy);border-radius:14px;padding:28px;color:white;margin-bottom:24px;}
+.revenue-box h3{color:var(--gold);margin-bottom:16px;}
+.revenue-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+@media(max-width:500px){.revenue-grid{grid-template-columns:1fr;}}
+.rev-item{background:rgba(255,255,255,0.07);border-radius:10px;padding:16px;}
+.rev-label{font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,0.6);margin-bottom:6px;}
+.rev-value{font-size:24px;font-weight:700;font-family:'Lora',serif;color:var(--gold);}
+.rev-sub{font-size:12px;color:rgba(255,255,255,0.6);margin-top:4px;}
+.protocol-section{background:white;border-radius:14px;padding:28px;margin-bottom:24px;}
+.protocol-section h3{color:var(--navy);margin-bottom:16px;}
+.protocol-item{display:flex;gap:14px;margin-bottom:14px;align-items:flex-start;padding:14px;background:var(--lgray);border-radius:10px;}
+.protocol-num{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0;}
+.protocol-content{flex:1;}
+.protocol-title{font-size:14px;font-weight:700;color:var(--navy);margin-bottom:4px;}
+.protocol-body{font-size:13px;color:var(--gray);line-height:1.6;}
+.root-causes{background:white;border-radius:14px;padding:28px;margin-bottom:24px;}
+.root-causes h3{color:var(--navy);margin-bottom:16px;}
+.rc-item{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--lgray);font-size:14px;}
+.rc-item:last-child{border-bottom:none;}
+.rc-name{color:var(--gray);}
+.rc-pct{font-weight:700;padding:3px 12px;border-radius:10px;font-size:13px;}
+.cta-box{background:var(--teal);border-radius:14px;padding:32px;color:white;text-align:center;margin-bottom:24px;}
+.cta-box h3{font-size:22px;margin-bottom:10px;}
+.cta-box p{opacity:0.85;margin-bottom:20px;}
+.disclaimer{background:white;border-radius:12px;padding:20px;font-size:12px;color:var(--gray);line-height:1.7;border:1px solid #e8e8e8;}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-inner">
+    <p class="eyebrow">ConnectingCare Group · Primary & Community Care Intelligence</p>
+    <h1>No-Show Intelligence Tool</h1>
+    <p class="header-sub">Identify the root causes driving your no-show rate — and generate intervention protocols matched to your specific patient population. Benchmarked against HRSA UDS national averages. Free. No account required.</p>
+    <div class="badges">
+      <span class="badge">HRSA UDS 2024 Benchmarks</span>
+      <span class="badge">SAMHSA No-Show Research</span>
+      <span class="badge">AAFP Scheduling Standards</span>
+      <span class="badge">NACHC Care Coordination Data</span>
+      <span class="badge">FQHCs · Rural Clinics · Community Health</span>
+    </div>
+  </div>
+  <div class="progress-wrap"><div class="progress-bar" id="progressBar"></div></div>
+  <div class="progress-meta">
+    <span class="progress-text" id="progressText">Section 1 of 4</span>
+    <div class="step-dots">
+      <div class="step-dot active"></div>
+      <div class="step-dot"></div>
+      <div class="step-dot"></div>
+      <div class="step-dot"></div>
+    </div>
+  </div>
+</div>
+
+<div class="main">
+
+<!-- SECTION 0: CLINIC PROFILE -->
+<div class="screen active" id="screen-0">
+  <h2 class="screen-title">Section 1 — Clinic Profile</h2>
+  <p class="screen-sub">Basic information about your clinic helps benchmark your results against comparable HRSA UDS organizations.</p>
+
+  <div class="form-section">
+    <p class="fs-title">🏥 Organization Information <span class="hint">(optional — improves benchmarking)</span></p>
+    <div class="form-grid">
+      <div class="form-group full">
+        <label>Organization Name</label>
+        <input type="text" id="orgName" placeholder="e.g. Riverside Community Health Center">
+      </div>
+      <div class="form-group">
+        <label>Organization Type</label>
+        <select id="orgType">
+          <option value="fqhc">FQHC / Community Health Center</option>
+          <option value="rural">Rural Health Clinic</option>
+          <option value="practice">Independent Practice</option>
+          <option value="faith">Faith-Based / Nonprofit Clinic</option>
+          <option value="disease">Disease Management Program</option>
+          <option value="other">Other Community Health Organization</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>State</label>
+        <select id="orgState">
+          <option value="">Select state...</option>
+          <option value="GA">Georgia</option><option value="NC">North Carolina</option>
+          <option value="KY">Kentucky</option><option value="AL">Alabama</option>
+          <option value="FL">Florida</option><option value="SC">South Carolina</option>
+          <option value="TN">Tennessee</option><option value="VA">Virginia</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Weekly Scheduled Appointments</label>
+        <select id="weeklyAppts">
+          <option value="100">Under 100</option>
+          <option value="200">100–200</option>
+          <option value="350" selected>201–400</option>
+          <option value="600">401–700</option>
+          <option value="900">700+</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Contact Email <span class="hint">(for full report)</span></label>
+        <input type="email" id="contactEmail" placeholder="your@clinic.org">
+      </div>
+    </div>
+  </div>
+
+  <div class="form-section">
+    <p class="fs-title">📊 Current No-Show Data</p>
+    <p class="fs-sub">Enter your best estimates. Ranges are acceptable.</p>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Overall No-Show Rate</label>
+        <div class="suffix-wrap">
+          <input type="number" id="noShowRate" placeholder="e.g. 22" min="0" max="60" value="">
+          <span class="suffix">%</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>No-Show Rate — New Patients <span class="hint">(if known)</span></label>
+        <div class="suffix-wrap">
+          <input type="number" id="newPatientNoShow" placeholder="e.g. 28" min="0" max="60" value="">
+          <span class="suffix">%</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>No-Show Rate — Behavioral Health <span class="hint">(if applicable)</span></label>
+        <div class="suffix-wrap">
+          <input type="number" id="bhNoShow" placeholder="e.g. 35" min="0" max="60" value="">
+          <span class="suffix">%</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Average Revenue Per Visit</label>
+        <div class="suffix-wrap">
+          <input type="number" id="revenuePerVisit" placeholder="e.g. 185" min="50" value="">
+          <span class="suffix">$</span>
+        </div>
+      </div>
+    </div>
+    <div class="callout callout-teal" style="margin-top:16px;">
+      <strong>HRSA UDS 2024 benchmark:</strong> The national average FQHC no-show rate is 18–22%. Approximately 60% of no-shows are attributable to causes that CCG's intervention protocols directly address. Leaving no-show rates unaddressed costs a mid-size FQHC an estimated $22,000–$30,400 in monthly revenue.
+    </div>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn btn-primary" onclick="goTo(1)">Section 2 — Root Cause Assessment →</button>
+  </div>
+</div>
+
+<!-- SECTION 1: ROOT CAUSE ASSESSMENT -->
+<div class="screen" id="screen-1">
+  <h2 class="screen-title">Section 2 — Root Cause Assessment</h2>
+  <p class="screen-sub">Eight validated root causes drive the majority of FQHC no-shows. These questions identify which are active in your patient population.</p>
+
+  <div class="question-card">
+    <p class="q-num">Root Cause 1 — Cost Uncertainty</p>
+    <p class="q-text">How often do patients cite cost concerns as a reason for missing or cancelling appointments?</p>
+    <div class="options" data-q="rc1">
+      <div class="opt" onclick="sel(this,'rc1',100)"><div class="opt-letter">A</div><div class="opt-text">Frequently — cost is one of our top 2 stated reasons for no-shows</div></div>
+      <div class="opt" onclick="sel(this,'rc1',65)"><div class="opt-letter">B</div><div class="opt-text">Sometimes — cost comes up regularly but isn't the top reason</div></div>
+      <div class="opt" onclick="sel(this,'rc1',35)"><div class="opt-letter">C</div><div class="opt-text">Rarely — we have a sliding fee program and most patients know about it</div></div>
+      <div class="opt" onclick="sel(this,'rc1',15)"><div class="opt-letter">D</div><div class="opt-text">Almost never — cost is not a significant driver at our clinic</div></div>
+    </div>
+  </div>
+
+  <div class="question-card">
+    <p class="q-num">Root Cause 2 — Transportation Barriers</p>
+    <p class="q-text">How significant is transportation as a barrier to appointment attendance in your patient population?</p>
+    <div class="options" data-q="rc2">
+      <div class="opt" onclick="sel(this,'rc2',100)"><div class="opt-letter">A</div><div class="opt-text">Very significant — transportation is a top-cited barrier in our community</div></div>
+      <div class="opt" onclick="sel(this,'rc2',70)"><div class="opt-letter">B</div><div class="opt-text">Significant — affects a meaningful portion of our patient population</div></div>
+      <div class="opt" onclick="sel(this,'rc2',35)"><div class="opt-letter">C</div><div class="opt-text">Moderate — affects some patients but not the majority</div></div>
+      <div class="opt" onclick="sel(this,'rc2',15)"><div class="opt-letter">D</div><div class="opt-text">Minimal — most patients have reliable transportation</div></div>
+    </div>
+  </div>
+
+  <div class="question-card">
+    <p class="q-num">Root Cause 3 — Scheduling Architecture</p>
+    <p class="q-text">Does your clinic have high no-show rates on specific days or times (e.g. Monday AM, end-of-day slots, 8+ day wait times)?</p>
+    <div class="options" data-q="rc3">
+      <div class="opt" onclick="sel(this,'rc3',100)"><div class="opt-letter">A</div><div class="opt-text">Yes — we have clear patterns: specific slots or days with significantly higher no-show rates</div></div>
+      <div class="opt" onclick="sel(this,'rc3',65)"><div class="opt-letter">B</div><div class="opt-text">Possibly — we suspect patterns but haven't analyzed them formally</div></div>
+      <div class="opt" onclick="sel(this,'rc3',35)"><div class="opt-letter">C</div><div class="opt-text">Not significantly — no-shows seem fairly distributed across the schedule</div></div>
+      <div class="opt" onclick="sel(this,'rc3',15)"><div class="opt-letter">D</div><div class="opt-text">No — our schedule is designed to minimize these patterns</div></div>
+    </div>
+  </div>
+
+  <div class="question-card">
+    <p class="q-num">Root Cause 4 — Health Literacy & Communication</p>
+    <p class="q-text">How effectively does your clinic communicate appointment details, expectations, and preparation instructions to patients?</p>
+    <div class="options" data-q="rc4">
+      <div class="opt" onclick="sel(this,'rc4',20)"><div class="opt-letter">A</div><div class="opt-text">Very effectively — we use plain language, multiple channels, and confirm comprehension</div></div>
+      <div class="opt" onclick="sel(this,'rc4',55)"><div class="opt-letter">B</div><div class="opt-text">Adequately — we send reminders but don't consistently confirm understanding</div></div>
+      <div class="opt" onclick="sel(this,'rc4',80)"><div class="opt-letter">C</div><div class="opt-text">Inconsistently — communication quality varies by staff member and appointment type</div></div>
+      <div class="opt" onclick="sel(this,'rc4',100)"><div class="opt-letter">D</div><div class="opt-text">Poorly — we know our patient communication has significant gaps</div></div>
+    </div>
+  </div>
+
+  <div class="question-card">
+    <p class="q-num">Root Cause 5 — Behavioral Health First Visits</p>
+    <p class="q-text">Does your clinic offer behavioral health services, and if so, what is your BH first-visit no-show rate relative to primary care?</p>
+    <div class="options" data-q="rc5">
+      <div class="opt" onclick="sel(this,'rc5',100)"><div class="opt-letter">A</div><div class="opt-text">Yes — BH first-visit no-show rate is significantly higher than primary care (30%+)</div></div>
+      <div class="opt" onclick="sel(this,'rc5',65)"><div class="opt-letter">B</div><div class="opt-text">Yes — BH no-show rate is higher but we manage it with some protocols</div></div>
+      <div class="opt" onclick="sel(this,'rc5',25)"><div class="opt-letter">C</div><div class="opt-text">Yes — BH and primary care no-show rates are comparable at our clinic</div></div>
+      <div class="opt" onclick="sel(this,'rc5',0)"><div class="opt-letter">D</div><div class="opt-text">We do not offer behavioral health services</div></div>
+    </div>
+  </div>
+
+  <div class="question-card">
+    <p class="q-num">Root Cause 6 — Wait Time to Appointment</p>
+    <p class="q-text">What is your average days to third next available appointment for primary care?</p>
+    <div class="options" data-q="rc6">
+      <div class="opt" onclick="sel(this,'rc6',100)"><div class="opt-letter">A</div><div class="opt-text">More than 14 days — patients frequently wait over two weeks</div></div>
+      <div class="opt" onclick="sel(this,'rc6',75)"><div class="opt-letter">B</div><div class="opt-text">8–14 days — patients typically wait 1–2 weeks</div></div>
+      <div class="opt" onclick="sel(this,'rc6',40)"><div class="opt-letter">C</div><div class="opt-text">4–7 days — within the MGMA recommended range</div></div>
+      <div class="opt" onclick="sel(this,'rc6',15)"><div class="opt-letter">D</div><div class="opt-text">1–3 days — same-day or next-day availability common</div></div>
+    </div>
+  </div>
+
+  <div class="question-card">
+    <p class="q-num">Root Cause 7 — Reminder & Outreach Protocol</p>
+    <p class="q-text">What is your current appointment reminder and pre-visit outreach protocol?</p>
+    <div class="options" data-q="rc7">
+      <div class="opt" onclick="sel(this,'rc7',15)"><div class="opt-letter">A</div><div class="opt-text">Structured — automated reminder + live confirmation call + 72-hour pre-visit contact</div></div>
+      <div class="opt" onclick="sel(this,'rc7',50)"><div class="opt-letter">B</div><div class="opt-text">Partial — automated reminder only, no live confirmation</div></div>
+      <div class="opt" onclick="sel(this,'rc7',80)"><div class="opt-letter">C</div><div class="opt-text">Minimal — reminder sent but inconsistent, no follow-up protocol</div></div>
+      <div class="opt" onclick="sel(this,'rc7',100)"><div class="opt-letter">D</div><div class="opt-text">Limited — little to no structured reminder or outreach process</div></div>
+    </div>
+  </div>
+
+  <div class="question-card">
+    <p class="q-num">Root Cause 8 — No-Show Recovery Protocol</p>
+    <p class="q-text">When a patient no-shows, what is your recovery protocol?</p>
+    <div class="options" data-q="rc8">
+      <div class="opt" onclick="sel(this,'rc8',10)"><div class="opt-letter">A</div><div class="opt-text">Structured — 72-hour recovery call, slot released for same-day, documented rescheduling rate</div></div>
+      <div class="opt" onclick="sel(this,'rc8',45)"><div class="opt-letter">B</div><div class="opt-text">Informal — staff try to reschedule but there's no formal protocol</div></div>
+      <div class="opt" onclick="sel(this,'rc8',75)"><div class="opt-letter">C</div><div class="opt-text">Minimal — we note the no-show but don't consistently follow up</div></div>
+      <div class="opt" onclick="sel(this,'rc8',100)"><div class="opt-letter">D</div><div class="opt-text">None — no-shows are recorded but no recovery protocol exists</div></div>
+    </div>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn btn-secondary" onclick="goTo(0)">← Back</button>
+    <button class="btn btn-primary" onclick="goTo(2)">Section 3 — Population Profile →</button>
+  </div>
+</div>
+
+<!-- SECTION 2: POPULATION PROFILE -->
+<div class="screen" id="screen-2">
+  <h2 class="screen-title">Section 3 — Population Profile</h2>
+  <p class="screen-sub">Your patient population characteristics directly affect which root causes are most active and which intervention protocols will have the highest impact.</p>
+
+  <div class="question-card">
+    <p class="q-num">Population Factor 1 — Insurance Mix</p>
+    <p class="q-text">What best describes your clinic's primary payer mix?</p>
+    <div class="options" data-q="pp1">
+      <div class="opt" onclick="sel(this,'pp1','medicaid_dominant')"><div class="opt-letter">A</div><div class="opt-text">Medicaid dominant (60%+ Medicaid MCO)</div></div>
+      <div class="opt" onclick="sel(this,'pp1','uninsured_high')"><div class="opt-letter">B</div><div class="opt-text">High uninsured population (25%+ uninsured or sliding fee)</div></div>
+      <div class="opt" onclick="sel(this,'pp1','mixed')"><div class="opt-letter">C</div><div class="opt-text">Mixed — Medicaid, uninsured, and some commercial</div></div>
+      <div class="opt" onclick="sel(this,'pp1','commercial_medicaid')"><div class="opt-letter">D</div><div class="opt-text">Commercial and Medicaid mix with low uninsured rate</div></div>
+    </div>
+  </div>
+
+  <div class="question-card">
+    <p class="q-num">Population Factor 2 — Language Access</p>
+    <p class="q-text">What percentage of your patients have limited English proficiency (LEP)?</p>
+    <div class="options" data-q="pp2">
+      <div class="opt" onclick="sel(this,'pp2',100)"><div class="opt-letter">A</div><div class="opt-text">More than 25% — significant LEP population requiring language support</div></div>
+      <div class="opt" onclick="sel(this,'pp2',65)"><div class="opt-letter">B</div><div class="opt-text">10–25% — meaningful LEP population</div></div>
+      <div class="opt" onclick="sel(this,'pp2',30)"><div class="opt-letter">C</div><div class="opt-text">Less than 10% LEP</div></div>
+      <div class="opt" onclick="sel(this,'pp2',10)"><div class="opt-letter">D</div><div class="opt-text">Minimal — primarily English-speaking population</div></div>
+    </div>
+  </div>
+
+  <div class="question-card">
+    <p class="q-num">Population Factor 3 — Social Risk Factors</p>
+    <p class="q-text">How prevalent are housing instability, food insecurity, or other social determinants in your patient population?</p>
+    <div class="options" data-q="pp3">
+      <div class="opt" onclick="sel(this,'pp3',100)"><div class="opt-letter">A</div><div class="opt-text">Very prevalent — our population has high rates of housing instability and social need</div></div>
+      <div class="opt" onclick="sel(this,'pp3',70)"><div class="opt-letter">B</div><div class="opt-text">Prevalent — a significant portion of patients face social risk factors</div></div>
+      <div class="opt" onclick="sel(this,'pp3',40)"><div class="opt-letter">C</div><div class="opt-text">Moderate — social risk factors present but not dominant</div></div>
+      <div class="opt" onclick="sel(this,'pp3',15)"><div class="opt-letter">D</div><div class="opt-text">Low — most patients are socially stable</div></div>
+    </div>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn btn-secondary" onclick="goTo(1)">← Back</button>
+    <button class="btn btn-gold" onclick="calculateResults()">Generate My No-Show Intelligence Report →</button>
+  </div>
+</div>
+
+<!-- RESULTS -->
+<div class="screen" id="screen-3">
+
+  <div class="results-hero">
+    <p class="eyebrow">ConnectingCare Group · No-Show Intelligence Tool</p>
+    <h2 class="results-title" id="resultsTitle">No-Show Intelligence Report</h2>
+    <p class="results-org" id="resultsOrg"></p>
+    <div class="score-wrap">
+      <div class="score-circle" id="scoreCircle">
+        <span class="score-num" id="overallScore">--</span>
+        <span class="score-sub">/ 100</span>
+      </div>
+      <div>
+        <div class="score-band-label" id="bandLabel"></div>
+        <div class="score-band-desc" id="bandDesc"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Revenue Impact -->
+  <div class="revenue-box" id="revenueBox">
+    <h3>Estimated Revenue Impact</h3>
+    <div class="revenue-grid" id="revenueGrid"></div>
+  </div>
+
+  <!-- Root Cause Rankings -->
+  <div class="root-causes">
+    <h3 style="color:var(--navy);margin-bottom:16px;">Your Top No-Show Root Causes</h3>
+    <p style="font-size:14px;color:var(--gray);margin-bottom:16px;">Ranked by impact score at your clinic. Focus intervention efforts on the highest-ranked causes first.</p>
+    <div id="rootCauseList"></div>
+  </div>
+
+  <!-- Domain Scores -->
+  <h3 style="font-family:'Lora',serif;color:var(--navy);margin-bottom:16px;">Assessment by Domain</h3>
+  <div class="domain-results" id="domainResults"></div>
+
+  <!-- Intervention Protocols -->
+  <div class="protocol-section">
+    <h3>Priority Intervention Protocols</h3>
+    <p style="font-size:14px;color:var(--gray);margin-bottom:16px;">Based on your root cause profile, these three protocols will have the highest impact on your no-show rate. Sourced from SAMHSA FQHC research, AAFP scheduling best practices, and NACHC care coordination standards.</p>
+    <div id="protocolList"></div>
+  </div>
+
+  <div class="cta-box">
+    <h3>Want a full No-Show Reduction Partnership?</h3>
+    <p>ConnectingCare Group can deploy a complete no-show intelligence system — including the CCG No-Show Risk Radar, 72-hour recovery protocol, and monthly performance reporting — as an embedded partnership with your clinic.</p>
+    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+      <a href="mailto:partners@connectingcaregroup.com?subject=No-Show Intelligence — Partnership Inquiry" class="btn btn-primary" style="text-decoration:none;">Request a Partnership Conversation</a>
+      <a href="https://connectingcaregroup.com/contact" class="btn btn-secondary" style="text-decoration:none;background:transparent;color:white;border-color:white;" target="_blank">Visit ConnectingCare Group</a>
+    </div>
+  </div>
+
+  <div class="disclaimer">
+    <strong>ConnectingCare Group · No-Show Intelligence Tool</strong><br>
+    Benchmarks sourced from: HRSA Uniform Data System (UDS) 2024 national FQHC averages · SAMHSA FQHC no-show literature · NACHC care coordination research · AAFP scheduling best practices · CMS Managed Care access standards. Revenue impact estimates derived from CCG Revenue Recovery Model. Actual results vary by clinic size, payer mix, and intervention consistency.<br><br>
+    This tool is for operational planning purposes only. It does not constitute clinical, medical, or legal advice. ConnectingCare Group (CCG) is a health access intelligence organization. connectingcaregroup.com · partners@connectingcaregroup.com
+  </div>
+
+  <div class="btn-row" style="justify-content:center;margin-top:24px;">
+    <button class="btn btn-secondary" onclick="window.print()">🖨 Print Report</button>
+    <button class="btn btn-primary" onclick="location.reload()">Start New Assessment</button>
+  </div>
+</div>
+
+</div>
+
+<script>
+let currentScreen=0;
+const answers={};
+
+function goTo(n){
+  document.getElementById('screen-'+currentScreen).classList.remove('active');
+  document.getElementById('screen-'+n).classList.add('active');
+  currentScreen=n;
+  updateProgress();
+  window.scrollTo(0,0);
+}
+function updateProgress(){
+  const pct=(currentScreen/3)*100;
+  document.getElementById('progressBar').style.width=pct+'%';
+  document.getElementById('progressText').textContent='Section '+(currentScreen+1)+' of 4';
+  document.querySelectorAll('.step-dot').forEach((d,i)=>{
+    d.classList.remove('active','done');
+    if(i===currentScreen) d.classList.add('active');
+    else if(i<currentScreen) d.classList.add('done');
+  });
+}
+function sel(el,key,val){
+  el.closest('.options').querySelectorAll('.opt').forEach(o=>o.classList.remove('selected'));
+  el.classList.add('selected');
+  answers[key]=val;
+}
+function fmt(n){return '$'+Math.round(n).toLocaleString();}
+
+function calculateResults(){
+  const noShowRate=parseFloat(document.getElementById('noShowRate').value)||22;
+  const weeklyAppts=parseFloat(document.getElementById('weeklyAppts').value)||350;
+  const revenuePerVisit=parseFloat(document.getElementById('revenuePerVisit').value)||185;
+  const orgName=document.getElementById('orgName').value||'Your Clinic';
+  const orgType=document.getElementById('orgType').value||'fqhc';
+
+  // Root cause scores
+  const rc={
+    rc1:answers.rc1||50,
+    rc2:answers.rc2||50,
+    rc3:answers.rc3||50,
+    rc4:answers.rc4||50,
+    rc5:answers.rc5||25,
+    rc6:answers.rc6||50,
+    rc7:answers.rc7||50,
+    rc8:answers.rc8||50,
+  };
+
+  // Overall score = average of root cause scores (higher = worse)
+  const rcValues=Object.values(rc);
+  const overallRisk=Math.round(rcValues.reduce((a,b)=>a+(typeof b==='number'?b:50),0)/rcValues.length);
+
+  // Convert to actionability score (100=most fixable, 0=already optimized)
+  let band,bandColor,bandDesc;
+  if(overallRisk>=75){
+    band='High Addressable Risk';bandColor='#C0392B';
+    bandDesc='Your no-show pattern has multiple high-impact root causes that CCG intervention protocols directly address. A structured 90-day implementation plan is recommended.';
+  } else if(overallRisk>=50){
+    band='Moderate Addressable Risk';bandColor='#E67E22';
+    bandDesc='Meaningful no-show root causes are active at your clinic. Targeting the top 2–3 factors with structured protocols can produce measurable rate reduction within 60 days.';
+  } else if(overallRisk>=25){
+    band='Low-Moderate Risk';bandColor='#C9963A';
+    bandDesc='Your clinic has addressed several no-show drivers effectively. Focused attention on remaining gaps and protocol strengthening can drive further improvement.';
+  } else {
+    band='Well Managed';bandColor='#1A7A4A';
+    bandDesc='Your no-show management practices are strong. CCG can support ongoing optimization, benchmarking, and recovery protocol refinement.';
+  }
+
+  // Revenue calculations
+  const weeklyNoShows=weeklyAppts*(noShowRate/100);
+  const addressablePct=0.60;
+  const addressableNoShows=weeklyNoShows*addressablePct;
+  const monthlyRevenueLoss=weeklyNoShows*4*revenuePerVisit;
+  const recoverableMonthly=addressableNoShows*4*revenuePerVisit;
+  const recoveryWith72hr=addressableNoShows*0.30*4*revenuePerVisit;
+
+  // Root cause ranking
+  const rcLabels={
+    rc1:'Cost Uncertainty & Sliding Fee Gaps',
+    rc2:'Transportation Barriers',
+    rc3:'Scheduling Architecture Problems',
+    rc4:'Health Literacy & Communication Gaps',
+    rc5:'Behavioral Health First-Visit Barriers',
+    rc6:'Extended Wait Times (Days to 3rd Next Available)',
+    rc7:'Insufficient Reminder & Outreach Protocol',
+    rc8:'Absent or Weak No-Show Recovery Protocol',
+  };
+  const rcSorted=Object.entries(rc)
+    .filter(([k,v])=>typeof v==='number')
+    .sort(([,a],[,b])=>b-a);
+
+  // Protocol recommendations based on top root causes
+  const protocolMap={
+    rc1:{title:'Pre-Visit Financial Navigation Call',body:'For every new patient and high-risk established patient: a 5-minute pre-visit cost estimate call using the CCG Financial Navigator. Removes cost uncertainty as a no-show driver. HRSA research: reduces new patient no-shows by ~34%, uninsured no-shows by ~28%.',color:'#0D7B8A'},
+    rc2:{title:'Transportation Resource Connection Protocol',body:'At scheduling, screen for transportation barriers using one question. Connect patients with Medicaid non-emergency medical transport (NEMT), local rideshare programs, or ROOTS Hub community resources before the appointment day.',color:'#1A7A4A'},
+    rc3:{title:'Scheduling Architecture Redesign',body:'Analyze no-show rates by day and time slot. Eliminate Monday AM over-booking, end-of-day clustering for high-risk patients, and 8+ day wait time slots for new patients. Reserve 15–20% of daily slots for same-day scheduling.',color:'#C9963A'},
+    rc4:{title:'Plain-Language Pre-Visit Communication',body:'Replace standard reminder with a 3-touch plain-language sequence: automated reminder → live confirmation call 48hrs prior → "what to bring" text day before. Use 4th–6th grade language. Bilingual for LEP patients.',color:'#0D7B8A'},
+    rc5:{title:'Behavioral Health First-Visit Navigator Call',body:'For every BH first appointment: a warm, plain-language navigator call 24–48 hours before the visit. SAMHSA research: reduces BH first-visit no-shows by 30–40%. Assign to care coordinator, not front desk.',color:'#C0392B'},
+    rc6:{title:'Wait Time Reduction & Same-Day Reserve Protocol',body:'Reduce days to third next available by reserving 20% of slots for same-day access. For patients waiting 8+ days, implement a mid-wait check-in call at day 4 to confirm attendance and address barriers.',color:'#1A7A4A'},
+    rc7:{title:'72-Hour Pre-Visit Outreach Protocol',body:'Structured outreach at 72 hours, 24 hours, and 2 hours before appointment. 72-hour call: confirm attendance + address barriers. 24-hour: plain-language reminder. 2-hour: text nudge for high-risk patients. Track confirmation rate.',color:'#C9963A'},
+    rc8:{title:'72-Hour No-Show Recovery Protocol',body:'Within 72 hours of every no-show: recovery call from care coordinator (not front desk). Reschedule at 3× the rate of no outreach. Release unrecovered slot for same-day by hour 4. NACHC data: well-executed recovery protocol recovers 25–35% of no-shows.',color:'#0D7B8A'},
+  };
+
+  // Domain scores
+  const domains=[
+    {label:'Cost & Financial Access',questions:['rc1'],color:'#0D7B8A'},
+    {label:'Transportation & Access Barriers',questions:['rc2'],color:'#1A7A4A'},
+    {label:'Scheduling Intelligence',questions:['rc3','rc6'],color:'#C9963A'},
+    {label:'Communication & Literacy',questions:['rc4'],color:'#1B2A4A'},
+    {label:'Behavioral Health Access',questions:['rc5'],color:'#C0392B'},
+    {label:'Outreach & Recovery Protocols',questions:['rc7','rc8'],color:'#E67E22'},
+  ];
+
+  // RENDER
+  document.getElementById('resultsTitle').textContent='No-Show Intelligence Report — '+orgName;
+  document.getElementById('resultsOrg').textContent=orgType.toUpperCase()+' · No-Show Rate: '+noShowRate+'% · Weekly Appointments: '+weeklyAppts;
+  const sc=document.getElementById('scoreCircle');
+  sc.style.borderColor=bandColor;
+  document.getElementById('overallScore').textContent=overallRisk;
+  document.getElementById('overallScore').style.color=bandColor;
+  document.getElementById('bandLabel').textContent=band;
+  document.getElementById('bandLabel').style.color=bandColor;
+  document.getElementById('bandDesc').textContent=bandDesc;
+
+  // Revenue
+  document.getElementById('revenueGrid').innerHTML=`
+    <div class="rev-item"><div class="rev-label">Monthly Revenue at Risk</div><div class="rev-value">${fmt(monthlyRevenueLoss)}</div><div class="rev-sub">${weeklyNoShows.toFixed(0)} no-shows/week × $${revenuePerVisit}/visit</div></div>
+    <div class="rev-item"><div class="rev-label">Addressable Monthly Revenue</div><div class="rev-value">${fmt(recoverableMonthly)}</div><div class="rev-sub">~60% attributable to directly addressable causes (SAMHSA)</div></div>
+    <div class="rev-item"><div class="rev-label">Est. 72-Hour Protocol Recovery</div><div class="rev-value">${fmt(recoveryWith72hr)}</div><div class="rev-sub">Estimated monthly recovery from structured outreach alone</div></div>
+    <div class="rev-item"><div class="rev-label">Annual Revenue Opportunity</div><div class="rev-value">${fmt(recoveryWith72hr*12)}</div><div class="rev-sub">If 72-hour protocol is implemented and sustained</div></div>`;
+
+  // Root causes
+  const rcList=document.getElementById('rootCauseList');
+  rcList.innerHTML='';
+  rcSorted.slice(0,6).forEach(([key,score],i)=>{
+    const pct=score;
+    const color=pct>=75?'#C0392B':pct>=50?'#E67E22':pct>=25?'#C9963A':'#1A7A4A';
+    const bg=pct>=75?'#FDECEA':pct>=50?'#FEF0D8':pct>=25?'#FEF6E8':'#E8F5EE';
+    rcList.innerHTML+=`<div class="rc-item">
+      <span class="rc-name">${i+1}. ${rcLabels[key]}</span>
+      <span class="rc-pct" style="background:${bg};color:${color}">${pct>=75?'High':pct>=50?'Moderate':pct>=25?'Low-Mod':'Low'}</span>
+    </div>`;
+  });
+
+  // Domain results
+  const dr=document.getElementById('domainResults');
+  dr.innerHTML='';
+  domains.forEach(d=>{
+    const scored=d.questions.filter(q=>answers[q]!==undefined&&typeof answers[q]==='number');
+    if(scored.length===0) return;
+    const score=Math.round(scored.reduce((s,q)=>s+answers[q],0)/scored.length);
+    const status=score>=75?'High Risk':score>=50?'Moderate':score>=25?'Low-Mod':'Optimized';
+    const statusBg=score>=75?'#FDECEA':score>=50?'#FEF0D8':score>=25?'#FEF6E8':'#E8F5EE';
+    const statusColor=score>=75?'#C0392B':score>=50?'#E67E22':score>=25?'#C9963A':'#1A7A4A';
+    dr.innerHTML+=`<div class="domain-card" style="border-top-color:${d.color}">
+      <p class="dc-label">Domain</p>
+      <p class="dc-title">${d.label}</p>
+      <div class="dc-score-row">
+        <span class="dc-score" style="color:${d.color}">${score}</span>
+        <div class="dc-bar-wrap"><div class="dc-bar" style="width:${score}%;background:${d.color}"></div></div>
+      </div>
+      <span class="dc-status" style="background:${statusBg};color:${statusColor}">${status}</span>
+    </div>`;
+  });
+
+  // Protocols — top 3 by root cause score
+  const top3=rcSorted.slice(0,3).map(([k])=>k);
+  const pl=document.getElementById('protocolList');
+  pl.innerHTML='';
+  top3.forEach((key,i)=>{
+    const p=protocolMap[key];
+    if(!p) return;
+    pl.innerHTML+=`<div class="protocol-item">
+      <div class="protocol-num" style="background:${p.color};color:white;">${i+1}</div>
+      <div class="protocol-content">
+        <div class="protocol-title">${p.title}</div>
+        <div class="protocol-body">${p.body}</div>
+      </div>
+    </div>`;
+  });
+
+  goTo(3);
+}
+updateProgress();
+</script>
+</body>
+</html>

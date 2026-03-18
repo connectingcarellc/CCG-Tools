@@ -1,0 +1,937 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CCG Aging & Post-Acute Access Index — ConnectingCare Group</title>
+<link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;600;700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy: #1B2A4A;
+  --teal: #0D7B8A;
+  --gold: #C9963A;
+  --green: #1A7A4A;
+  --red: #C0392B;
+  --gray: #4A5568;
+  --lgray: #F1F4F8;
+  --white: #ffffff;
+  --lgold: #FEF6E8;
+  --lgreen: #E8F5EE;
+  --lred: #FDECEA;
+  --lblue: #EAF3FB;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'DM Sans', sans-serif; background: var(--lgray); color: var(--gray); line-height: 1.6; }
+h1,h2,h3,h4 { font-family: 'Lora', serif; }
+
+/* HEADER */
+.header { background: var(--navy); padding: 0; }
+.header-inner { max-width: 900px; margin: 0 auto; padding: 32px 24px; }
+.header-eyebrow { font-size: 11px; font-weight: 600; letter-spacing: 3px; text-transform: uppercase; color: var(--teal); margin-bottom: 12px; }
+.header h1 { font-size: clamp(24px, 4vw, 38px); color: white; font-weight: 700; line-height: 1.2; margin-bottom: 12px; }
+.header-sub { color: rgba(255,255,255,0.7); font-size: 15px; max-width: 620px; line-height: 1.7; }
+.header-badges { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 20px; }
+.badge { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); color: rgba(255,255,255,0.8); padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+
+/* PROGRESS */
+.progress-bar-wrap { background: rgba(255,255,255,0.1); height: 4px; }
+.progress-bar { background: var(--teal); height: 4px; transition: width 0.4s ease; width: 0%; }
+.progress-label { max-width: 900px; margin: 0 auto; padding: 8px 24px; display: flex; justify-content: space-between; align-items: center; }
+.progress-text { font-size: 12px; color: rgba(255,255,255,0.6); }
+.domain-indicators { display: flex; gap: 6px; }
+.domain-dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.2); transition: background 0.3s; }
+.domain-dot.active { background: var(--teal); }
+.domain-dot.complete { background: var(--green); }
+
+/* MAIN */
+.main { max-width: 900px; margin: 0 auto; padding: 32px 24px 80px; }
+
+/* SCREENS */
+.screen { display: none; }
+.screen.active { display: block; }
+
+/* ORG SELECTOR */
+.org-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; margin-top: 24px; }
+.org-card { background: white; border: 2px solid #e0e0e0; border-radius: 12px; padding: 20px; cursor: pointer; transition: all 0.2s; }
+.org-card:hover { border-color: var(--teal); transform: translateY(-2px); box-shadow: 0 4px 16px rgba(13,123,138,0.12); }
+.org-card.selected { border-color: var(--teal); background: var(--lblue); }
+.org-card-track { font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 6px; }
+.track-a .org-card-track { color: var(--teal); }
+.track-b .org-card-track { color: var(--gold); }
+.org-card-name { font-size: 15px; font-weight: 600; color: var(--navy); }
+
+/* INTAKE */
+.intake-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 20px; }
+@media(max-width:600px){ .intake-grid { grid-template-columns: 1fr; } }
+.form-group label { display: block; font-size: 13px; font-weight: 600; color: var(--navy); margin-bottom: 6px; }
+.form-group input, .form-group select {
+  width: 100%; padding: 10px 14px; border: 1.5px solid #d0d0d0; border-radius: 8px;
+  font-family: 'DM Sans', sans-serif; font-size: 14px; color: var(--gray);
+  transition: border-color 0.2s;
+}
+.form-group input:focus, .form-group select:focus { outline: none; border-color: var(--teal); }
+.form-group.full { grid-column: 1/-1; }
+
+/* DOMAIN HEADER */
+.domain-header { background: white; border-radius: 14px; padding: 24px; margin-bottom: 24px; border-left: 5px solid var(--teal); }
+.domain-eyebrow { font-size: 10px; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase; color: var(--teal); margin-bottom: 6px; }
+.domain-title { font-size: 22px; font-weight: 700; color: var(--navy); margin-bottom: 8px; }
+.domain-source { font-size: 12px; color: var(--gray); opacity: 0.7; }
+
+/* QUESTIONS */
+.question-card { background: white; border-radius: 12px; padding: 24px; margin-bottom: 16px; border: 1px solid #e8e8e8; }
+.question-number { font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--teal); margin-bottom: 8px; }
+.question-text { font-size: 15px; font-weight: 600; color: var(--navy); margin-bottom: 16px; line-height: 1.5; }
+.options { display: flex; flex-direction: column; gap: 10px; }
+.option { display: flex; align-items: flex-start; gap: 12px; padding: 12px 16px; border: 1.5px solid #e0e0e0; border-radius: 10px; cursor: pointer; transition: all 0.2s; }
+.option:hover { border-color: var(--teal); background: var(--lblue); }
+.option.selected { border-color: var(--teal); background: var(--lblue); }
+.option-letter { width: 28px; height: 28px; border-radius: 50%; background: var(--lgray); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: var(--navy); flex-shrink: 0; transition: all 0.2s; }
+.option.selected .option-letter { background: var(--teal); color: white; }
+.option-text { font-size: 14px; color: var(--gray); line-height: 1.5; padding-top: 3px; }
+.multi-select-note { font-size: 12px; color: var(--teal); font-weight: 600; margin-bottom: 8px; }
+.checkbox-group { display: flex; flex-direction: column; gap: 8px; }
+.checkbox-item { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border: 1.5px solid #e0e0e0; border-radius: 8px; cursor: pointer; transition: all 0.2s; }
+.checkbox-item:hover { border-color: var(--teal); background: var(--lblue); }
+.checkbox-item input[type=checkbox] { width: 16px; height: 16px; accent-color: var(--teal); }
+.checkbox-item label { font-size: 14px; color: var(--gray); cursor: pointer; }
+.na-option { margin-top: 8px; }
+
+/* SECTION DIVIDER */
+.section-divider { height: 2px; background: linear-gradient(90deg, var(--teal), transparent); margin: 32px 0; border-radius: 1px; }
+
+/* CARDS */
+.card { background: white; border-radius: 14px; padding: 24px; margin-bottom: 20px; }
+.card-title { font-size: 18px; font-weight: 700; color: var(--navy); margin-bottom: 8px; }
+
+/* BUTTONS */
+.btn { display: inline-flex; align-items: center; gap: 8px; padding: 12px 28px; border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; border: none; transition: all 0.2s; }
+.btn-primary { background: var(--teal); color: white; }
+.btn-primary:hover { background: #0a6575; }
+.btn-secondary { background: white; color: var(--navy); border: 2px solid var(--navy); }
+.btn-secondary:hover { background: var(--navy); color: white; }
+.btn-gold { background: var(--gold); color: white; }
+.btn-gold:hover { background: #a87d2e; }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.btn-row { display: flex; gap: 12px; margin-top: 28px; flex-wrap: wrap; }
+
+/* RESULTS */
+.results-header { background: var(--navy); border-radius: 14px; padding: 32px; color: white; margin-bottom: 24px; }
+.results-score-wrap { display: flex; align-items: center; gap: 24px; flex-wrap: wrap; margin: 20px 0; }
+.score-circle { width: 100px; height: 100px; border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; border: 4px solid; flex-shrink: 0; }
+.score-number { font-family: 'Lora', serif; font-size: 32px; font-weight: 700; line-height: 1; }
+.score-label { font-size: 10px; letter-spacing: 1px; text-transform: uppercase; margin-top: 2px; }
+.score-band { flex: 1; }
+.score-band-label { font-size: 18px; font-weight: 700; margin-bottom: 6px; }
+.score-band-desc { font-size: 14px; opacity: 0.8; line-height: 1.6; }
+
+.domain-results { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; margin-bottom: 24px; }
+.domain-result-card { background: white; border-radius: 12px; padding: 20px; border-top: 4px solid; }
+.dr-domain { font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--gray); margin-bottom: 6px; }
+.dr-title { font-size: 14px; font-weight: 600; color: var(--navy); margin-bottom: 12px; }
+.dr-score-row { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+.dr-score { font-size: 28px; font-weight: 700; font-family: 'Lora', serif; }
+.dr-bar-wrap { flex: 1; height: 8px; background: var(--lgray); border-radius: 4px; overflow: hidden; }
+.dr-bar { height: 8px; border-radius: 4px; transition: width 1s ease; }
+.dr-status { font-size: 12px; font-weight: 600; padding: 2px 10px; border-radius: 10px; display: inline-block; }
+
+.action-brief { background: var(--lgold); border-radius: 14px; padding: 24px; margin-bottom: 24px; border-left: 5px solid var(--gold); }
+.action-brief h3 { color: var(--navy); margin-bottom: 16px; }
+.action-item { display: flex; gap: 12px; margin-bottom: 12px; align-items: flex-start; }
+.action-num { width: 28px; height: 28px; border-radius: 50%; background: var(--gold); color: white; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; flex-shrink: 0; }
+.action-text { font-size: 14px; color: var(--gray); line-height: 1.6; padding-top: 4px; }
+
+.cta-section { background: var(--teal); border-radius: 14px; padding: 32px; color: white; text-align: center; margin-bottom: 24px; }
+.cta-section h3 { font-size: 22px; margin-bottom: 10px; }
+.cta-section p { opacity: 0.85; margin-bottom: 20px; }
+
+.disclaimer { background: white; border-radius: 12px; padding: 20px; font-size: 12px; color: var(--gray); line-height: 1.7; border: 1px solid #e8e8e8; }
+
+/* SCREEN TITLES */
+.screen-title { font-size: 26px; font-weight: 700; color: var(--navy); margin-bottom: 8px; }
+.screen-sub { font-size: 15px; color: var(--gray); margin-bottom: 24px; max-width: 600px; }
+
+/* CALLOUT */
+.callout { border-radius: 10px; padding: 16px 20px; margin: 16px 0; font-size: 14px; line-height: 1.6; }
+.callout-teal { background: var(--lblue); border-left: 4px solid var(--teal); color: var(--navy); }
+.callout-gold { background: var(--lgold); border-left: 4px solid var(--gold); color: var(--navy); }
+
+/* TRACK B BANNER */
+.track-banner { background: linear-gradient(135deg, var(--gold), #a87d2e); border-radius: 10px; padding: 14px 20px; color: white; font-size: 13px; font-weight: 600; margin-bottom: 24px; display: flex; align-items: center; gap: 10px; }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-inner">
+    <p class="header-eyebrow">ConnectingCare Group · Access Intelligence Platform</p>
+    <h1>Aging & Post-Acute Access Index</h1>
+    <p class="header-sub">A structured assessment measuring access performance across seven domains for SNFs, assisted living communities, VA homes, LTACHs, and post-acute care settings. Free. No signup required.</p>
+    <div class="header-badges">
+      <span class="badge">Post-Acute & Senior Care & Aging</span>
+      <span class="badge">6 Operational Domains</span>
+      <span class="badge">Federal Benchmarks</span>
+      <span class="badge">CMS · VA · ACL · NIA · AHRQ</span>
+      <span class="badge">~20 Minutes</span>
+    </div>
+  </div>
+  <div class="progress-bar-wrap">
+    <div class="progress-bar" id="progressBar"></div>
+  </div>
+  <div class="progress-label">
+    <span class="progress-text" id="progressText">Step 1 of 10</span>
+    <div class="domain-indicators" id="domainIndicators">
+      <div class="domain-dot" title="Organization"></div>
+      <div class="domain-dot" title="Intake"></div>
+      <div class="domain-dot" title="Domain 1"></div>
+      <div class="domain-dot" title="Domain 2"></div>
+      <div class="domain-dot" title="Domain 3"></div>
+      <div class="domain-dot" title="Domain 4"></div>
+      <div class="domain-dot" title="Domain 5"></div>
+      <div class="domain-dot" title="Domain 6"></div>
+      <div class="domain-dot" title="Readiness"></div>
+      <div class="domain-dot" title="Results"></div>
+    </div>
+  </div>
+</div>
+
+<div class="main">
+
+<!-- SCREEN 0: ORG TYPE -->
+<div class="screen active" id="screen-0">
+  <h2 class="screen-title">What type of organization are you completing this assessment for?</h2>
+  <p class="screen-sub">Your answer determines which ConnectingCare Group access assessment is most relevant to your setting.</p>
+
+  <p style="font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:12px;">For: SNFs, Assisted Living, VA Homes, Memory Care & Post-Acute Settings</p>
+  <div class="org-grid" id="orgGrid">
+    <div class="org-card track-b" data-org="SNF" data-track="B" onclick="selectOrg(this)">
+      <div class="org-card-track">Post-Acute & Senior Care</div>
+      <div class="org-card-name">Skilled Nursing Facility (SNF)</div>
+    </div>
+    <div class="org-card track-b" data-org="LTACH" data-track="B" onclick="selectOrg(this)">
+      <div class="org-card-track">Post-Acute & Senior Care</div>
+      <div class="org-card-name">Long-Term Acute Care Hospital (LTACH)</div>
+    </div>
+    <div class="org-card track-b" data-org="Assisted Living" data-track="B" onclick="selectOrg(this)">
+      <div class="org-card-track">Senior & Long-Term Care</div>
+      <div class="org-card-name">Assisted Living Community</div>
+    </div>
+    <div class="org-card track-b" data-org="Memory Care" data-track="B" onclick="selectOrg(this)">
+      <div class="org-card-track">Senior & Long-Term Care</div>
+      <div class="org-card-name">Memory Care Facility</div>
+    </div>
+    <div class="org-card track-b" data-org="VA Home" data-track="B" onclick="selectOrg(this)">
+      <div class="org-card-track">Veterans & VA Care</div>
+      <div class="org-card-name">VA-Affiliated Facility or VA Home</div>
+    </div>
+    <div class="org-card track-b" data-org="Home Health" data-track="B" onclick="selectOrg(this)">
+      <div class="org-card-track">Home & Community Care</div>
+      <div class="org-card-name">Home Health Agency</div>
+    </div>
+    <div class="org-card track-b" data-org="CCRC" data-track="B" onclick="selectOrg(this)">
+      <div class="org-card-track">Senior & Long-Term Care</div>
+      <div class="org-card-name">Continuing Care Retirement Community (CCRC)</div>
+    </div>
+    <div class="org-card track-b" data-org="Other Post-Acute" data-track="B" onclick="selectOrg(this)">
+      <div class="org-card-track">Post-Acute & Senior Care</div>
+      <div class="org-card-name">Other Post-Acute or Senior Care Setting</div>
+    </div>
+  </div>
+
+  <div class="callout callout-teal" style="margin-top:24px;">
+    <strong>Looking for the primary care / FQHC assessment?</strong> The ConnectingCare Group also offers a Primary & Community Care Access Index designed for FQHCs, rural clinics, independent practices, and community health organizations. <a href="connectingcaregroup.com/screener" style="color:var(--teal);font-weight:600;">Visit the Primary Care screener →</a>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn btn-primary" onclick="goToScreen(1)" id="btn-org-next" disabled>Continue →</button>
+  </div>
+</div>
+
+<!-- SCREEN 1: INTAKE -->
+<div class="screen" id="screen-1">
+  <h2 class="screen-title">Tell us about your organization</h2>
+  <p class="screen-sub">Optional — but helps ConnectingCare Group understand your context and follow up with relevant resources. No account required.</p>
+  <div class="intake-grid">
+    <div class="form-group full">
+      <label>Organization Name <span style="font-weight:400;color:var(--gray)">(optional)</span></label>
+      <input type="text" id="orgName" placeholder="e.g. Sunrise Skilled Nursing & Rehabilitation">
+    </div>
+    <div class="form-group">
+      <label>City <span style="font-weight:400;color:var(--gray)">(optional)</span></label>
+      <input type="text" id="orgCity" placeholder="e.g. Atlanta">
+    </div>
+    <div class="form-group">
+      <label>State <span style="font-weight:400;color:var(--gray)">(optional)</span></label>
+      <select id="orgState">
+        <option value="">Select state...</option>
+        <option>Alabama</option><option>Alaska</option><option>Arizona</option><option>Arkansas</option>
+        <option>California</option><option>Colorado</option><option>Connecticut</option><option>Delaware</option>
+        <option>Florida</option><option>Georgia</option><option>Hawaii</option><option>Idaho</option>
+        <option>Illinois</option><option>Indiana</option><option>Iowa</option><option>Kansas</option>
+        <option>Kentucky</option><option>Louisiana</option><option>Maine</option><option>Maryland</option>
+        <option>Massachusetts</option><option>Michigan</option><option>Minnesota</option><option>Mississippi</option>
+        <option>Missouri</option><option>Montana</option><option>Nebraska</option><option>Nevada</option>
+        <option>New Hampshire</option><option>New Jersey</option><option>New Mexico</option><option>New York</option>
+        <option>North Carolina</option><option>North Dakota</option><option>Ohio</option><option>Oklahoma</option>
+        <option>Oregon</option><option>Pennsylvania</option><option>Rhode Island</option><option>South Carolina</option>
+        <option>South Dakota</option><option>Tennessee</option><option>Texas</option><option>Utah</option>
+        <option>Vermont</option><option>Virginia</option><option>Washington</option><option>West Virginia</option>
+        <option>Wisconsin</option><option>Wyoming</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Your Role <span style="font-weight:400;color:var(--gray)">(optional)</span></label>
+      <select id="userRole">
+        <option value="">Select role...</option>
+        <option>Administrator / Executive Director</option>
+        <option>Director of Nursing</option>
+        <option>Clinical Manager</option>
+        <option>Quality Improvement / Compliance</option>
+        <option>Social Worker / Case Manager</option>
+        <option>Care Coordinator</option>
+        <option>Business Office Manager</option>
+        <option>Other Clinical Staff</option>
+        <option>Other Administrative Staff</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Number of Beds / Census <span style="font-weight:400;color:var(--gray)">(optional)</span></label>
+      <select id="facilitySize">
+        <option value="">Select size...</option>
+        <option>Under 50 beds</option>
+        <option>50–100 beds</option>
+        <option>101–200 beds</option>
+        <option>Over 200 beds</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Contact Email <span style="font-weight:400;color:var(--gray)">(for full report)</span></label>
+      <input type="email" id="contactEmail" placeholder="your@organization.org">
+    </div>
+  </div>
+  <div class="callout callout-teal">
+    <strong>Want your full Access Index report with recommendations?</strong> Enter your email above and we'll send your scored report — benchmarked against CMS Five-Star national averages — within 5 business days.
+  </div>
+  <div class="btn-row">
+    <button class="btn btn-secondary" onclick="goToScreen(0)">← Back</button>
+    <button class="btn btn-primary" onclick="goToScreen(2)">Start Assessment →</button>
+  </div>
+</div>
+
+<!-- SCREEN 2: DOMAIN 1 — CARE TRANSITIONS -->
+<div class="screen" id="screen-2">
+  <div class="track-banner">📋 CCG Aging & Post-Acute Access Index</div>
+  <div class="domain-header">
+    <p class="domain-eyebrow">Domain 1 of 6</p>
+    <h2 class="domain-title">Care Transition Intelligence</h2>
+    <p class="domain-source">Federal standards: CMS 42 CFR 483.21 · INTERACT Protocols · AMDA Clinical Guidelines · MedPAC Post-Acute Reports · National benchmark: 15.6% 30-day readmission rate (CMS)</p>
+  </div>
+
+  <div class="question-card">
+    <p class="question-number">Question B1-1</p>
+    <p class="question-text">What is your facility's current 30-day hospital readmission rate?</p>
+    <div class="options" data-q="b1_1">
+      <div class="option" onclick="selectOption(this,'b1_1',100)"><div class="option-letter">A</div><div class="option-text">Below 10% — well below national average</div></div>
+      <div class="option" onclick="selectOption(this,'b1_1',75)"><div class="option-letter">B</div><div class="option-text">10–15% — near national average</div></div>
+      <div class="option" onclick="selectOption(this,'b1_1',45)"><div class="option-letter">C</div><div class="option-text">16–20% — above national average</div></div>
+      <div class="option" onclick="selectOption(this,'b1_1',20)"><div class="option-letter">D</div><div class="option-text">Above 20% — significantly above national average</div></div>
+      <div class="option" onclick="selectOption(this,'b1_1',30)"><div class="option-letter">E</div><div class="option-text">We don't track this metric currently</div></div>
+    </div>
+  </div>
+
+  <div class="question-card">
+    <p class="question-number">Question B1-2</p>
+    <p class="question-text">How would you describe your discharge planning and care transition communication process?</p>
+    <div class="options" data-q="b1_2">
+      <div class="option" onclick="selectOption(this,'b1_2',100)"><div class="option-letter">A</div><div class="option-text">Structured — we have a formal protocol with documented handoffs and follow-up confirmation</div></div>
+      <div class="option" onclick="selectOption(this,'b1_2',70)"><div class="option-letter">B</div><div class="option-text">Mostly consistent — we follow a process but it varies by staff and shift</div></div>
+      <div class="option" onclick="selectOption(this,'b1_2',40)"><div class="option-letter">C</div><div class="option-text">Informal — transitions happen but without a standard protocol</div></div>
+      <div class="option" onclick="selectOption(this,'b1_2',20)"><div class="option-letter">D</div><div class="option-text">Reactive — we address transition issues as they arise</div></div>
+    </div>
+  </div>
+
+  <div class="question-card">
+    <p class="question-number">Question B1-3</p>
+    <p class="question-text">How often do residents return from hospital stays without complete discharge documentation?</p>
+    <div class="options" data-q="b1_3">
+      <div class="option" onclick="selectOption(this,'b1_3',100)"><div class="option-letter">A</div><div class="option-text">Rarely — less than 10% of returns</div></div>
+      <div class="option" onclick="selectOption(this,'b1_3',65)"><div class="option-letter">B</div><div class="option-text">Sometimes — 10–25% of returns</div></div>
+      <div class="option" onclick="selectOption(this,'b1_3',35)"><div class="option-letter">C</div><div class="option-text">Frequently — more than 25% of returns</div></div>
+      <div class="option" onclick="selectOption(this,'b1_3',15)"><div class="option-letter">D</div><div class="option-text">Almost always — documentation gaps are the norm</div></div>
+    </div>
+  </div>
+
+  <div class="question-card">
+    <p class="question-number">Question B1-4</p>
+    <p class="question-text">Does your facility use a structured tool (such as INTERACT, SBAR, or similar) to identify and manage residents at risk of acute care transfer?</p>
+    <div class="options" data-q="b1_4">
+      <div class="option" onclick="selectOption(this,'b1_4',100)"><div class="option-letter">A</div><div class="option-text">Yes — consistently used across all shifts</div></div>
+      <div class="option" onclick="selectOption(this,'b1_4',60)"><div class="option-letter">B</div><div class="option-text">Yes — used inconsistently</div></div>
+      <div class="option" onclick="selectOption(this,'b1_4',45)"><div class="option-letter">C</div><div class="option-text">No — but we are planning to implement one</div></div>
+      <div class="option" onclick="selectOption(this,'b1_4',25)"><div class="option-letter">D</div><div class="option-text">No — we rely on clinical judgment alone</div></div>
+    </div>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn btn-secondary" onclick="goToScreen(1)">← Back</button>
+    <button class="btn btn-primary" onclick="goToScreen(3)" id="btn-d1">Domain 2 →</button>
+  </div>
+</div>
+
+<!-- SCREEN 3: DOMAIN 2 — RESIDENT ACCESS NAVIGATION -->
+<div class="screen" id="screen-3">
+  <div class="track-banner">📋 CCG Aging & Post-Acute Access Index</div>
+  <div class="domain-header">
+    <p class="domain-eyebrow">Domain 2 of 6</p>
+    <h2 class="domain-title">Resident & Patient Access Navigation</h2>
+    <p class="domain-source">Federal standards: CMS Long-Term Care Regulations (42 CFR 483) · VA Community Care Program · NCQA Care Coordination measures</p>
+  </div>
+
+  <div class="question-card">
+    <p class="question-number">Question B2-1</p>
+    <p class="question-text">How does your facility support residents who need specialty care outside your setting?</p>
+    <div class="options" data-q="b2_1">
+      <div class="option" onclick="selectOption(this,'b2_1',100)"><div class="option-letter">A</div><div class="option-text">We have a dedicated care coordinator who manages all external referrals and tracks completion</div></div>
+      <div class="option" onclick="selectOption(this,'b2_1',65)"><div class="option-letter">B</div><div class="option-text">We coordinate referrals but tracking is inconsistent</div></div>
+      <div class="option" onclick="selectOption(this,'b2_1',35)"><div class="option-letter">C</div><div class="option-text">We make referrals but do not consistently follow up</div></div>
+      <div class="option" onclick="selectOption(this,'b2_1',15)"><div class="option-letter">D</div><div class="option-text">Residents or families are responsible for coordinating their own outside care</div></div>
+    </div>
+  </div>
+
+  <div class="question-card">
+    <p class="question-number">Question B2-2</p>
+    <p class="question-text">What percentage of your residents have difficulty accessing off-site appointments due to transportation, mobility, or scheduling barriers?</p>
+    <div class="options" data-q="b2_2">
+      <div class="option" onclick="selectOption(this,'b2_2',100)"><div class="option-letter">A</div><div class="option-text">Less than 10%</div></div>
+      <div class="option" onclick="selectOption(this,'b2_2',75)"><div class="option-letter">B</div><div class="option-text">10–25%</div></div>
+      <div class="option" onclick="selectOption(this,'b2_2',45)"><div class="option-letter">C</div><div class="option-text">26–40%</div></div>
+      <div class="option" onclick="selectOption(this,'b2_2',20)"><div class="option-letter">D</div><div class="option-text">More than 40%</div></div>
+      <div class="option" onclick="selectOption(this,'b2_2',30)"><div class="option-letter">E</div><div class="option-text">We don't track this</div></div>
+    </div>
+  </div>
+
+  <div class="question-card">
+    <p class="question-number">Question B2-3</p>
+    <p class="question-text">Does your facility offer or coordinate telehealth services for residents who cannot easily travel to appointments?</p>
+    <div class="options" data-q="b2_3">
+      <div class="option" onclick="selectOption(this,'b2_3',100)"><div class="option-letter">A</div><div class="option-text">Yes — telehealth is integrated into our care model</div></div>
+      <div class="option" onclick="selectOption(this,'b2_3',65)"><div class="option-letter">B</div><div class="option-text">Yes — available but underutilized</div></div>
+      <div class="option" onclick="selectOption(this,'b2_3',40)"><div class="option-letter">C</div><div class="option-text">No — but we are exploring it</div></div>
+      <div class="option" onclick="selectOption(this,'b2_3',20)"><div class="option-letter">D</div><div class="option-text">No — not available</div></div>
+    </div>
+  </div>
+
+  <div class="question-card">
+    <p class="question-number">Question B2-4 <span style="font-size:11px;color:var(--teal);font-weight:600;">(VA-affiliated facilities — skip if not applicable)</span></p>
+    <p class="question-text">How would you rate your staff's familiarity with VA Community Care benefits and how to navigate them for eligible residents?</p>
+    <div class="options" data-q="b2_4">
+      <div class="option" onclick="selectOption(this,'b2_4',100)"><div class="option-letter">A</div><div class="option-text">Strong — staff are trained and confident</div></div>
+      <div class="option" onclick="selectOption(this,'b2_4',65)"><div class="option-letter">B</div><div class="option-text">Moderate — some staff understand, others do not</div></div>
+      <div class="option" onclick="selectOption(this,'b2_4',35)"><div class="option-letter">C</div><div class="option-text">Limited — most staff are unfamiliar with VA benefits</div></div>
+      <div class="option" onclick="selectOption(this,'b2_4',15)"><div class="option-letter">D</div><div class="option-text">None — we have not addressed VA benefit navigation</div></div>
+      <div class="option na-option" onclick="selectOption(this,'b2_4',-1)"><div class="option-letter">N/A</div><div class="option-text">Not applicable — we do not serve VA-eligible residents</div></div>
+    </div>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn btn-secondary" onclick="goToScreen(2)">← Back</button>
+    <button class="btn btn-primary" onclick="goToScreen(4)">Domain 3 →</button>
+  </div>
+</div>
+
+<!-- SCREEN 4: DOMAIN 3 — COGNITIVE & COMMUNICATION -->
+<div class="screen" id="screen-4">
+  <div class="track-banner">📋 CCG Aging & Post-Acute Access Index</div>
+  <div class="domain-header">
+    <p class="domain-eyebrow">Domain 3 of 6</p>
+    <h2 class="domain-title">Cognitive & Communication Access</h2>
+    <p class="domain-source">Federal standards: HRSA Health Literacy Standards · Joint Commission Communication Standards · CMS Residents Rights (42 CFR 483.10) · NCQA · ADA</p>
+  </div>
+
+  <div class="question-card">
+    <p class="question-number">Question B3-1</p>
+    <p class="question-text">How does your facility communicate care plans, treatment options, and rights information to residents with cognitive impairment?</p>
+    <div class="options" data-q="b3_1">
+      <div class="option" onclick="selectOption(this,'b3_1',100)"><div class="option-letter">A</div><div class="option-text">We use dementia-appropriate communication protocols and document accommodation for each resident</div></div>
+      <div class="option" onclick="selectOption(this,'b3_1',60)"><div class="option-letter">B</div><div class="option-text">We adapt communication informally based on staff judgment but without a formal protocol</div></div>
+      <div class="option" onclick="selectOption(this,'b3_1',30)"><div class="option-letter">C</div><div class="option-text">We use standard communication approaches for all residents regardless of cognitive status</div></div>
+      <div class="option" onclick="selectOption(this,'b3_1',40)"><div class="option-letter">D</div><div class="option-text">We rely primarily on family members to communicate with cognitively impaired residents</div></div>
+    </div>
+  </div>
+
+  <div class="question-card">
+    <p class="question-number">Question B3-2 <span style="font-size:11px;color:var(--teal);font-weight:600;">(Select all that apply — data capture)</span></p>
+    <p class="question-text">What languages are your residents and their families most likely to need services in beyond English?</p>
+    <p class="multi-select-note">Select all that apply</p>
+    <div class="checkbox-group">
+      <div class="checkbox-item"><input type="checkbox" id="lang_es" value="Spanish"><label for="lang_es">Spanish</label></div>
+      <div class="checkbox-item"><input type="checkbox" id="lang_zh" value="Mandarin/Chinese"><label for="lang_zh">Mandarin / Chinese</label></div>
+      <div class="checkbox-item"><input type="checkbox" id="lang_vi" value="Vietnamese"><label for="lang_vi">Vietnamese</label></div>
+      <div class="checkbox-item"><input type="checkbox" id="lang_ko" value="Korean"><label for="lang_ko">Korean</label></div>
+      <div class="checkbox-item"><input type="checkbox" id="lang_tl" value="Tagalog"><label for="lang_tl">Tagalog</label></div>
+      <div class="checkbox-item"><input type="checkbox" id="lang_ar" value="Arabic"><label for="lang_ar">Arabic</label></div>
+      <div class="checkbox-item"><input type="checkbox" id="lang_ru" value="Russian"><label for="lang_ru">Russian</label></div>
+      <div class="checkbox-item"><input type="checkbox" id="lang_ht" value="Haitian Creole"><label for="lang_ht">Haitian Creole</label></div>
+      <div class="checkbox-item"><input type="checkbox" id="lang_pt" value="Portuguese"><label for="lang_pt">Portuguese</label></div>
+      <div class="checkbox-item"><input type="checkbox" id="lang_en" value="English only"><label for="lang_en">English only</label></div>
+    </div>
+  </div>
+
+  <div class="question-card">
+    <p class="question-number">Question B3-3</p>
+    <p class="question-text">Does your facility have access to professional interpretation services for non-English speaking residents?</p>
+    <div class="options" data-q="b3_3">
+      <div class="option" onclick="selectOption(this,'b3_3',100)"><div class="option-letter">A</div><div class="option-text">Yes — we use a professional interpretation service consistently</div></div>
+      <div class="option" onclick="selectOption(this,'b3_3',55)"><div class="option-letter">B</div><div class="option-text">Yes — available but we often rely on family or staff</div></div>
+      <div class="option" onclick="selectOption(this,'b3_3',35)"><div class="option-letter">C</div><div class="option-text">No — we rely on bilingual staff or family members</div></div>
+      <div class="option" onclick="selectOption(this,'b3_3',20)"><div class="option-letter">D</div><div class="option-text">No — we have a gap here we have not addressed</div></div>
+    </div>
+  </div>
+
+  <div class="question-card">
+    <p class="question-number">Question B3-4</p>
+    <p class="question-text">How confident are you that residents with cognitive impairment understand their right to refuse treatment, file grievances, and participate in care planning?</p>
+    <div class="options" data-q="b3_4">
+      <div class="option" onclick="selectOption(this,'b3_4',100)"><div class="option-letter">A</div><div class="option-text">Very confident — we have documented processes to support informed participation</div></div>
+      <div class="option" onclick="selectOption(this,'b3_4',65)"><div class="option-letter">B</div><div class="option-text">Somewhat confident — we try but acknowledge gaps</div></div>
+      <div class="option" onclick="selectOption(this,'b3_4',35)"><div class="option-letter">C</div><div class="option-text">Not very confident — this is a known challenge</div></div>
+      <div class="option" onclick="selectOption(this,'b3_4',15)"><div class="option-letter">D</div><div class="option-text">Not confident — we have not formally addressed this</div></div>
+    </div>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn btn-secondary" onclick="goToScreen(3)">← Back</button>
+    <button class="btn btn-primary" onclick="goToScreen(5)">Domain 4 →</button>
+  </div>
+</div>
+
+<!-- SCREEN 5: DOMAIN 4 — MEDICATION ACCESS -->
+<div class="screen" id="screen-5">
+  <div class="track-banner">📋 CCG Aging & Post-Acute Access Index</div>
+  <div class="domain-header">
+    <p class="domain-eyebrow">Domain 4 of 6</p>
+    <h2 class="domain-title">Medication & Treatment Access</h2>
+    <p class="domain-source">Federal standards: CMS Five-Star Medication Measures · ASHP Medication Management Standards · CMS MDS Medication Indicators · AMDA Guidelines · Medicare Part D Standards</p>
+  </div>
+
+  <div class="question-card">
+    <p class="question-number">Question B4-1</p>
+    <p class="question-text">How often do residents experience delays in receiving prescribed medications after admission or after a medication change?</p>
+    <div class="options" data-q="b4_1">
+      <div class="option" onclick="selectOption(this,'b4_1',100)"><div class="option-letter">A</div><div class="option-text">Rarely — less than 5% of cases</div></div>
+      <div class="option" onclick="selectOption(this,'b4_1',70)"><div class="option-letter">B</div><div class="option-text">Sometimes — 5–15% of cases</div></div>
+      <div class="option" onclick="selectOption(this,'b4_1',35)"><div class="option-letter">C</div><div class="option-text">Frequently — more than 15% of cases</div></div>
+      <div class="option" onclick="selectOption(this,'b4_1',30)"><div class="option-letter">D</div><div class="option-text">We don't track medication access delays</div></div>
+    </div>
+  </div>
+
+  <div class="question-card">
+    <p class="question-number">Question B4-2</p>
+    <p class="question-text">How does your facility handle Medicare Part D formulary issues that create barriers to medication access for residents?</p>
+    <div class="options" data-q="b4_2">
+      <div class="option" onclick="selectOption(this,'b4_2',100)"><div class="option-letter">A</div><div class="option-text">We have a dedicated process — pharmacy coordinator or staff member manages exceptions and appeals</div></div>
+      <div class="option" onclick="selectOption(this,'b4_2',65)"><div class="option-letter">B</div><div class="option-text">We handle issues case by case without a formal process</div></div>
+      <div class="option" onclick="selectOption(this,'b4_2',30)"><div class="option-letter">C</div><div class="option-text">We rely on the resident or family to navigate formulary issues</div></div>
+      <div class="option" onclick="selectOption(this,'b4_2',15)"><div class="option-letter">D</div><div class="option-text">This is a frequent unresolved challenge</div></div>
+    </div>
+  </div>
+
+  <div class="question-card">
+    <p class="question-number">Question B4-3 <span style="font-size:11px;color:var(--teal);font-weight:600;">(Skip if not applicable)</span></p>
+    <p class="question-text">For dual-eligible residents (Medicare and Medicaid) — how well does your facility navigate the coordination between payers for treatment access?</p>
+    <div class="options" data-q="b4_3">
+      <div class="option" onclick="selectOption(this,'b4_3',100)"><div class="option-letter">A</div><div class="option-text">Well — we have experience and a process for dual-eligible coordination</div></div>
+      <div class="option" onclick="selectOption(this,'b4_3',65)"><div class="option-letter">B</div><div class="option-text">Adequately — we manage but it is time-consuming</div></div>
+      <div class="option" onclick="selectOption(this,'b4_3',25)"><div class="option-letter">C</div><div class="option-text">Poorly — dual-eligible coordination is a frequent source of delays and errors</div></div>
+      <div class="option na-option" onclick="selectOption(this,'b4_3',-1)"><div class="option-letter">N/A</div><div class="option-text">We do not serve dual-eligible residents</div></div>
+    </div>
+  </div>
+
+  <div class="question-card">
+    <p class="question-number">Question B4-4</p>
+    <p class="question-text">Does your facility track and report medication-related adverse events that may reflect access failures?</p>
+    <div class="options" data-q="b4_4">
+      <div class="option" onclick="selectOption(this,'b4_4',100)"><div class="option-letter">A</div><div class="option-text">Yes — tracked, reported, and reviewed systematically</div></div>
+      <div class="option" onclick="selectOption(this,'b4_4',65)"><div class="option-letter">B</div><div class="option-text">Yes — tracked but not consistently reviewed</div></div>
+      <div class="option" onclick="selectOption(this,'b4_4',35)"><div class="option-letter">C</div><div class="option-text">No — we report required incidents but do not systematically analyze medication access failures</div></div>
+      <div class="option" onclick="selectOption(this,'b4_4',15)"><div class="option-letter">D</div><div class="option-text">No — this is a gap we have not addressed</div></div>
+    </div>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn btn-secondary" onclick="goToScreen(4)">← Back</button>
+    <button class="btn btn-primary" onclick="goToScreen(6)">Domain 5 →</button>
+  </div>
+</div>
+
+<!-- SCREEN 6: DOMAIN 5 — FAMILY & CAREGIVER -->
+<div class="screen" id="screen-6">
+  <div class="track-banner">📋 CCG Aging & Post-Acute Access Index</div>
+  <div class="domain-header">
+    <p class="domain-eyebrow">Domain 5 of 6</p>
+    <h2 class="domain-title">Family & Caregiver Engagement</h2>
+    <p class="domain-source">Federal standards: NIA · AARP Public Policy Institute · CMS Residents Rights (42 CFR 483.10) · ACL Caregiver Support Program Standards · Joint Commission Family Engagement</p>
+  </div>
+
+  <div class="question-card">
+    <p class="question-number">Question B5-1</p>
+    <p class="question-text">How does your facility involve family members and caregivers in care planning and discharge planning?</p>
+    <div class="options" data-q="b5_1">
+      <div class="option" onclick="selectOption(this,'b5_1',100)"><div class="option-letter">A</div><div class="option-text">Formally — family meetings are scheduled, documented, and required for all care plan updates</div></div>
+      <div class="option" onclick="selectOption(this,'b5_1',70)"><div class="option-letter">B</div><div class="option-text">Regularly — family involvement happens but without a consistent formal process</div></div>
+      <div class="option" onclick="selectOption(this,'b5_1',40)"><div class="option-letter">C</div><div class="option-text">When requested — we engage families when they initiate contact</div></div>
+      <div class="option" onclick="selectOption(this,'b5_1',15)"><div class="option-letter">D</div><div class="option-text">Minimally — family engagement is limited in practice</div></div>
+    </div>
+  </div>
+
+  <div class="question-card">
+    <p class="question-number">Question B5-2</p>
+    <p class="question-text">Does your facility screen for caregiver burden among family members who are primary caregivers for your residents?</p>
+    <div class="options" data-q="b5_2">
+      <div class="option" onclick="selectOption(this,'b5_2',100)"><div class="option-letter">A</div><div class="option-text">Yes — we screen regularly and connect caregivers to support resources</div></div>
+      <div class="option" onclick="selectOption(this,'b5_2',55)"><div class="option-letter">B</div><div class="option-text">Informally — staff identify burden but we don't formally screen</div></div>
+      <div class="option" onclick="selectOption(this,'b5_2',40)"><div class="option-letter">C</div><div class="option-text">No — but we are aware this is a gap</div></div>
+      <div class="option" onclick="selectOption(this,'b5_2',15)"><div class="option-letter">D</div><div class="option-text">No — caregiver burden is not something we address</div></div>
+    </div>
+  </div>
+
+  <div class="question-card">
+    <p class="question-number">Question B5-3</p>
+    <p class="question-text">How does your facility communicate with families when a resident's condition changes or a care decision needs to be made urgently?</p>
+    <div class="options" data-q="b5_3">
+      <div class="option" onclick="selectOption(this,'b5_3',100)"><div class="option-letter">A</div><div class="option-text">We have a clear rapid-notification protocol — families are reached within a defined timeframe</div></div>
+      <div class="option" onclick="selectOption(this,'b5_3',65)"><div class="option-letter">B</div><div class="option-text">We contact families but the process varies by staff and situation</div></div>
+      <div class="option" onclick="selectOption(this,'b5_3',40)"><div class="option-letter">C</div><div class="option-text">We contact families when we can but delays are common</div></div>
+      <div class="option" onclick="selectOption(this,'b5_3',20)"><div class="option-letter">D</div><div class="option-text">Family notification is inconsistent</div></div>
+    </div>
+  </div>
+
+  <div class="question-card">
+    <p class="question-number">Question B5-4</p>
+    <p class="question-text">Does your facility provide families with plain-language information about the resident's rights, your grievance process, and how to advocate for their family member?</p>
+    <div class="options" data-q="b5_4">
+      <div class="option" onclick="selectOption(this,'b5_4',100)"><div class="option-letter">A</div><div class="option-text">Yes — written materials provided at admission and reviewed regularly</div></div>
+      <div class="option" onclick="selectOption(this,'b5_4',70)"><div class="option-letter">B</div><div class="option-text">Yes — provided at admission but not reinforced</div></div>
+      <div class="option" onclick="selectOption(this,'b5_4',45)"><div class="option-letter">C</div><div class="option-text">Available on request but not proactively shared</div></div>
+      <div class="option" onclick="selectOption(this,'b5_4',20)"><div class="option-letter">D</div><div class="option-text">No — this is not a current practice</div></div>
+    </div>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn btn-secondary" onclick="goToScreen(5)">← Back</button>
+    <button class="btn btn-primary" onclick="goToScreen(7)">Domain 6 →</button>
+  </div>
+</div>
+
+<!-- SCREEN 7: DOMAIN 6 — REGULATORY COMPLIANCE -->
+<div class="screen" id="screen-7">
+  <div class="track-banner">📋 CCG Aging & Post-Acute Access Index</div>
+  <div class="domain-header">
+    <p class="domain-eyebrow">Domain 6 of 6</p>
+    <h2 class="domain-title">Regulatory Compliance Access</h2>
+    <p class="domain-source">Federal standards: CMS Five-Star Quality Rating System · CMS CASPER Database · State Survey Deficiency Patterns · Joint Commission Long-Term Care Standards · OIG Compliance Guidance</p>
+  </div>
+
+  <div class="question-card">
+    <p class="question-number">Question B6-1</p>
+    <p class="question-text">In your most recent CMS survey, did your facility receive any deficiencies related to resident rights, care planning, or access to care?</p>
+    <div class="options" data-q="b6_1">
+      <div class="option" onclick="selectOption(this,'b6_1',100)"><div class="option-letter">A</div><div class="option-text">No deficiencies in these areas</div></div>
+      <div class="option" onclick="selectOption(this,'b6_1',65)"><div class="option-letter">B</div><div class="option-text">Minor deficiencies — cited and corrected</div></div>
+      <div class="option" onclick="selectOption(this,'b6_1',30)"><div class="option-letter">C</div><div class="option-text">Significant deficiencies — required a plan of correction</div></div>
+      <div class="option" onclick="selectOption(this,'b6_1',35)"><div class="option-letter">D</div><div class="option-text">We have not been surveyed recently or do not know our current status</div></div>
+    </div>
+  </div>
+
+  <div class="question-card">
+    <p class="question-number">Question B6-2</p>
+    <p class="question-text">How does your facility handle resident grievances related to care access — such as not receiving a requested service, delayed treatment, or denied referral?</p>
+    <div class="options" data-q="b6_2">
+      <div class="option" onclick="selectOption(this,'b6_2',100)"><div class="option-letter">A</div><div class="option-text">Formal process — grievances are logged, investigated, and resolved within a defined timeframe</div></div>
+      <div class="option" onclick="selectOption(this,'b6_2',60)"><div class="option-letter">B</div><div class="option-text">Informal process — grievances are addressed but not systematically tracked</div></div>
+      <div class="option" onclick="selectOption(this,'b6_2',30)"><div class="option-letter">C</div><div class="option-text">No formal process — complaints are handled individually as they arise</div></div>
+      <div class="option" onclick="selectOption(this,'b6_2',50)"><div class="option-letter">D</div><div class="option-text">Grievances are rare and we have not formalized a process</div></div>
+    </div>
+  </div>
+
+  <div class="question-card">
+    <p class="question-number">Question B6-3</p>
+    <p class="question-text">Does your facility have a compliance officer or designated person responsible for monitoring access-related regulatory requirements?</p>
+    <div class="options" data-q="b6_3">
+      <div class="option" onclick="selectOption(this,'b6_3',100)"><div class="option-letter">A</div><div class="option-text">Yes — dedicated compliance officer or coordinator</div></div>
+      <div class="option" onclick="selectOption(this,'b6_3',70)"><div class="option-letter">B</div><div class="option-text">Yes — responsibility assigned to a clinical or administrative leader as part of their role</div></div>
+      <div class="option" onclick="selectOption(this,'b6_3',35)"><div class="option-letter">C</div><div class="option-text">No — compliance is a shared informal responsibility</div></div>
+      <div class="option" onclick="selectOption(this,'b6_3',45)"><div class="option-letter">D</div><div class="option-text">No — we rely on our corporate or management company for compliance oversight</div></div>
+    </div>
+  </div>
+
+  <div class="question-card">
+    <p class="question-number">Question B6-4</p>
+    <p class="question-text">How current is your staff training on resident rights and access-related regulatory requirements?</p>
+    <div class="options" data-q="b6_4">
+      <div class="option" onclick="selectOption(this,'b6_4',100)"><div class="option-letter">A</div><div class="option-text">Current — training is annual or more frequent with documented completion</div></div>
+      <div class="option" onclick="selectOption(this,'b6_4',65)"><div class="option-letter">B</div><div class="option-text">Mostly current — training happens but completion is inconsistent</div></div>
+      <div class="option" onclick="selectOption(this,'b6_4',30)"><div class="option-letter">C</div><div class="option-text">Outdated — training has not been updated recently</div></div>
+      <div class="option" onclick="selectOption(this,'b6_4',20)"><div class="option-letter">D</div><div class="option-text">Minimal — formal training on these topics is limited</div></div>
+    </div>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn btn-secondary" onclick="goToScreen(6)">← Back</button>
+    <button class="btn btn-primary" onclick="goToScreen(8)">Organizational Readiness →</button>
+  </div>
+</div>
+
+<!-- SCREEN 8: DOMAIN 7 — READINESS -->
+<div class="screen" id="screen-8">
+  <div class="track-banner">CCG Aging & Post-Acute Access Index · Final Domain</div>
+  <div class="domain-header">
+    <p class="domain-eyebrow">Domain 7 — Organizational Readiness</p>
+    <h2 class="domain-title">Is your organization ready to improve?</h2>
+    <p class="domain-source">These questions help ConnectingCare Group understand how to best support your improvement journey. There are no wrong answers.</p>
+  </div>
+
+  <div class="question-card">
+    <p class="question-number">Question R1</p>
+    <p class="question-text">How would you describe your leadership team's current appetite for operational change?</p>
+    <div class="options" data-q="r1">
+      <div class="option" onclick="selectOption(this,'r1',100)"><div class="option-letter">A</div><div class="option-text">Actively seeking change — leadership is aligned and ready to move</div></div>
+      <div class="option" onclick="selectOption(this,'r1',75)"><div class="option-letter">B</div><div class="option-text">Open to change — leadership is supportive but cautious</div></div>
+      <div class="option" onclick="selectOption(this,'r1',50)"><div class="option-letter">C</div><div class="option-text">Mixed — some leaders are ready, others are resistant</div></div>
+      <div class="option" onclick="selectOption(this,'r1',25)"><div class="option-letter">D</div><div class="option-text">Change is difficult here — significant internal barriers exist</div></div>
+      <div class="option" onclick="selectOption(this,'r1',40)"><div class="option-letter">E</div><div class="option-text">Not sure — hard to gauge leadership sentiment right now</div></div>
+    </div>
+  </div>
+
+  <div class="question-card">
+    <p class="question-number">Question R2</p>
+    <p class="question-text">Does your team currently have the bandwidth to implement new workflows or processes?</p>
+    <div class="options" data-q="r2">
+      <div class="option" onclick="selectOption(this,'r2',100)"><div class="option-letter">A</div><div class="option-text">Yes — we have dedicated capacity for improvement initiatives</div></div>
+      <div class="option" onclick="selectOption(this,'r2',75)"><div class="option-letter">B</div><div class="option-text">Somewhat — we can make time if the process is streamlined</div></div>
+      <div class="option" onclick="selectOption(this,'r2',40)"><div class="option-letter">C</div><div class="option-text">Limited — our team is stretched and bandwidth is a real concern</div></div>
+      <div class="option" onclick="selectOption(this,'r2',20)"><div class="option-letter">D</div><div class="option-text">No — we are in survival mode right now</div></div>
+    </div>
+  </div>
+
+  <div class="question-card">
+    <p class="question-number">Question R3</p>
+    <p class="question-text">How does your organization currently use data to make operational decisions?</p>
+    <div class="options" data-q="r3">
+      <div class="option" onclick="selectOption(this,'r3',100)"><div class="option-letter">A</div><div class="option-text">Actively — data drives our decisions regularly</div></div>
+      <div class="option" onclick="selectOption(this,'r3',70)"><div class="option-letter">B</div><div class="option-text">Sometimes — we use data when it's easily available</div></div>
+      <div class="option" onclick="selectOption(this,'r3',30)"><div class="option-letter">C</div><div class="option-text">Rarely — we rely more on experience and intuition</div></div>
+      <div class="option" onclick="selectOption(this,'r3',60)"><div class="option-letter">D</div><div class="option-text">We want to use data more but don't have the right tools or access</div></div>
+    </div>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn btn-secondary" onclick="goToScreen(7)">← Back</button>
+    <button class="btn btn-gold" onclick="calculateResults()">See My Results →</button>
+  </div>
+</div>
+
+<!-- SCREEN 9: RESULTS -->
+<div class="screen" id="screen-9">
+  <div class="results-header" id="resultsHeader">
+    <p style="font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--teal);margin-bottom:8px;">ConnectingCare Group · Aging & Post-Acute Access Index</p>
+    <h2 style="font-size:28px;margin-bottom:6px;" id="resultsOrgName">Your Organization</h2>
+    <p style="opacity:0.7;font-size:14px;" id="resultsOrgType"></p>
+    <div class="results-score-wrap">
+      <div class="score-circle" id="scoreCircle">
+        <span class="score-number" id="overallScore">--</span>
+        <span class="score-label">/ 100</span>
+      </div>
+      <div class="score-band">
+        <div class="score-band-label" id="scoreBandLabel"></div>
+        <div class="score-band-desc" id="scoreBandDesc"></div>
+      </div>
+    </div>
+  </div>
+
+  <h3 style="font-family:'Lora',serif;color:var(--navy);margin-bottom:16px;">Domain Scores</h3>
+  <div class="domain-results" id="domainResults"></div>
+
+  <div class="action-brief" id="actionBrief">
+    <h3>Your Priority Actions</h3>
+    <div id="actionItems"></div>
+  </div>
+
+  <div class="cta-section">
+    <h3>Want your full report and recommendations?</h3>
+    <p>ConnectingCare Group will prepare a complete Access Index Report — with domain-specific recommendations benchmarked against CMS Five-Star national averages — and deliver it within 5 business days.</p>
+    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+      <a href="mailto:partners@connectingcaregroup.com?subject=Aging & Post-Acute Access Index — Full Report Request" class="btn btn-primary" style="text-decoration:none;">Request Full Report</a>
+      <a href="https://connectingcaregroup.com/contact" class="btn btn-secondary" style="text-decoration:none;background:transparent;color:white;border-color:white;" target="_blank">Schedule a Conversation</a>
+    </div>
+  </div>
+
+  <div class="disclaimer">
+    <strong>ConnectingCare Group · Aging & Post-Acute Access Index</strong><br>
+    Benchmarks sourced from: CMS Five-Star Quality Rating System · CMS Minimum Data Set (MDS) 3.0 · CMS CASPER Database · AHRQ Healthcare Cost and Utilization Project (HCUP) · MedPAC Post-Acute Care Reports (2014–2024) · Administration for Community Living (ACL) · National Institute on Aging (NIA) · VA Community Care Program · INTERACT Protocols · AMDA Clinical Practice Guidelines.<br><br>
+    This assessment is designed for operational planning purposes. It does not constitute clinical advice, medical guidance, legal recommendations, or regulatory determinations. ConnectingCare Group (CCG) is a health access intelligence organization. CCG does not practice medicine or any licensed health profession. Results reflect self-reported data and should be interpreted alongside your organization's specific context. connectingcaregroup.com · info@connectingcaregroup.com
+  </div>
+
+  <div class="btn-row" style="justify-content:center;">
+    <button class="btn btn-secondary" onclick="window.print()">🖨 Print Results</button>
+    <button class="btn btn-primary" onclick="location.reload()">Start New Assessment</button>
+  </div>
+</div>
+
+</div><!-- /main -->
+
+<script>
+// State
+const answers = {};
+let selectedOrg = null;
+let currentScreen = 0;
+const totalScreens = 10;
+
+// Domain config
+const domains = [
+  { key:'d1', label:'Care Transition Intelligence', questions:['b1_1','b1_2','b1_3','b1_4'], color:'#0D7B8A' },
+  { key:'d2', label:'Resident Access Navigation', questions:['b2_1','b2_2','b2_3','b2_4'], color:'#1A7A4A' },
+  { key:'d3', label:'Cognitive & Communication', questions:['b3_1','b3_3','b3_4'], color:'#C9963A' },
+  { key:'d4', label:'Medication & Treatment', questions:['b4_1','b4_2','b4_3','b4_4'], color:'#1B2A4A' },
+  { key:'d5', label:'Family & Caregiver Engagement', questions:['b5_1','b5_2','b5_3','b5_4'], color:'#0D7B8A' },
+  { key:'d6', label:'Regulatory Compliance', questions:['b6_1','b6_2','b6_3','b6_4'], color:'#C0392B' },
+  { key:'d7', label:'Organizational Readiness', questions:['r1','r2','r3'], color:'#6B46C1' },
+];
+
+function selectOrg(el) {
+  document.querySelectorAll('.org-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedOrg = { name: el.dataset.org, track: el.dataset.track };
+  document.getElementById('btn-org-next').disabled = false;
+}
+
+function selectOption(el, qKey, score) {
+  const parent = el.closest('.options');
+  parent.querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+  answers[qKey] = score;
+}
+
+function goToScreen(n) {
+  document.getElementById('screen-' + currentScreen).classList.remove('active');
+  document.getElementById('screen-' + n).classList.add('active');
+  currentScreen = n;
+  updateProgress();
+  window.scrollTo(0, 0);
+}
+
+function updateProgress() {
+  const pct = (currentScreen / (totalScreens - 1)) * 100;
+  document.getElementById('progressBar').style.width = pct + '%';
+  document.getElementById('progressText').textContent = 'Step ' + (currentScreen + 1) + ' of ' + totalScreens;
+  document.querySelectorAll('.domain-dot').forEach((dot, i) => {
+    dot.classList.remove('active', 'complete');
+    if (i === currentScreen) dot.classList.add('active');
+    else if (i < currentScreen) dot.classList.add('complete');
+  });
+}
+
+function domainScore(domain) {
+  const qs = domain.questions;
+  const scored = qs.filter(q => answers[q] !== undefined && answers[q] !== -1);
+  if (scored.length === 0) return null;
+  const total = scored.reduce((s, q) => s + answers[q], 0);
+  return Math.round(total / scored.length);
+}
+
+function calculateResults() {
+  // Calculate scores
+  const dScores = domains.map(d => ({ ...d, score: domainScore(d) }));
+  const validScores = dScores.filter(d => d.score !== null);
+  const operationalScores = validScores.filter(d => d.key !== 'd7');
+  const readinessScore = validScores.find(d => d.key === 'd7');
+
+  let overall = 0;
+  if (operationalScores.length > 0) {
+    const opAvg = operationalScores.reduce((s, d) => s + d.score, 0) / operationalScores.length;
+    const readWeight = readinessScore ? readinessScore.score * 0.15 : 0;
+    overall = Math.round(opAvg * 0.85 + readWeight);
+  }
+
+  // Band
+  let band, bandDesc, bandColor;
+  if (overall >= 80) {
+    band = 'High Performance'; bandColor = '#1A7A4A';
+    bandDesc = 'Your facility demonstrates strong access infrastructure. A ConnectingCare Group partnership can focus on optimization, continuous improvement, and building toward CMS 4–5 star quality measures.';
+  } else if (overall >= 60) {
+    band = 'Moderate Performance'; bandColor = '#C9963A';
+    bandDesc = 'Meaningful gaps exist in 2–3 domains. A ConnectingCare Group partnership will target your highest-priority domains first with a structured 90-day improvement roadmap. CMS equivalent: 3 stars.';
+  } else if (overall >= 40) {
+    band = 'Significant Gaps'; bandColor = '#E67E22';
+    bandDesc = 'Access failures are systemic across multiple domains. A full ConnectingCare Group partnership with a phased roadmap is recommended. CMS equivalent: 2 stars.';
+  } else {
+    band = 'Critical Access Failures'; bandColor = '#C0392B';
+    bandDesc = 'Immediate intervention is needed. ConnectingCare Group will prioritize compliance risk and resident safety alongside access improvement. CMS equivalent: 1 star.';
+  }
+
+  // Update results header
+  const orgName = document.getElementById('orgName').value || (selectedOrg ? selectedOrg.name : 'Your Organization');
+  document.getElementById('resultsOrgName').textContent = orgName;
+  document.getElementById('resultsOrgType').textContent = selectedOrg ? selectedOrg.name + ' · Aging & Post-Acute Access Assessment' : 'Aging & Post-Acute Access Assessment';
+
+  const circle = document.getElementById('scoreCircle');
+  circle.style.borderColor = bandColor;
+  document.getElementById('overallScore').style.color = bandColor;
+  document.getElementById('overallScore').textContent = overall;
+  document.getElementById('scoreBandLabel').textContent = band;
+  document.getElementById('scoreBandLabel').style.color = bandColor;
+  document.getElementById('scoreBandDesc').textContent = bandDesc;
+
+  // Domain results
+  const container = document.getElementById('domainResults');
+  container.innerHTML = '';
+  dScores.forEach(d => {
+    if (d.score === null) return;
+    const pct = d.score;
+    let status, statusBg, statusColor;
+    if (pct >= 80) { status = 'Strong'; statusBg = '#E8F5EE'; statusColor = '#1A7A4A'; }
+    else if (pct >= 60) { status = 'Moderate'; statusBg = '#FEF6E8'; statusColor = '#C9963A'; }
+    else if (pct >= 40) { status = 'Needs Attention'; statusBg = '#FEF0D8'; statusColor = '#E67E22'; }
+    else { status = 'Critical Gap'; statusBg = '#FDECEA'; statusColor = '#C0392B'; }
+    container.innerHTML += `
+      <div class="domain-result-card" style="border-top-color:${d.color}">
+        <p class="dr-domain">Domain</p>
+        <p class="dr-title">${d.label}</p>
+        <div class="dr-score-row">
+          <span class="dr-score" style="color:${d.color}">${d.score}</span>
+          <div class="dr-bar-wrap"><div class="dr-bar" style="width:${d.score}%;background:${d.color}"></div></div>
+        </div>
+        <span class="dr-status" style="background:${statusBg};color:${statusColor}">${status}</span>
+      </div>`;
+  });
+
+  // Priority actions
+  const sorted = [...dScores].filter(d => d.score !== null && d.key !== 'd7').sort((a,b) => a.score - b.score);
+  const top3 = sorted.slice(0, 3);
+  const actionMap = {
+    'd1': 'Implement or formalize your care transition protocol. Consider adopting the INTERACT SBAR tool for risk identification — it reduces acute transfers by up to 24% per AMDA research.',
+    'd2': 'Assign a dedicated care coordinator for external referral tracking. Explore telehealth options for residents with transportation barriers.',
+    'd3': 'Develop dementia-appropriate communication protocols and contract with a professional interpretation service. Prioritize resident rights documentation for cognitively impaired residents.',
+    'd4': 'Designate a pharmacy coordinator to manage Part D formulary exceptions and dual-eligible payer coordination. Implement a medication delay tracking system.',
+    'd5': 'Formalize family care planning meetings and implement a caregiver burden screening tool. Consider ACL caregiver support program resources.',
+    'd6': 'Conduct a compliance gap analysis focused on resident rights and care access deficiencies. Update staff training to annual cadence with documented completion.',
+  };
+  const actionEl = document.getElementById('actionItems');
+  actionEl.innerHTML = '';
+  top3.forEach((d, i) => {
+    actionEl.innerHTML += `
+      <div class="action-item">
+        <div class="action-num">${i+1}</div>
+        <div class="action-text"><strong>${d.label} (${d.score}/100):</strong> ${actionMap[d.key] || 'Contact ConnectingCare Group for domain-specific recommendations.'}</div>
+      </div>`;
+  });
+
+  goToScreen(9);
+}
+
+// Init
+updateProgress();
+</script>
+</body>
+</html>
